@@ -1,16 +1,17 @@
 <template>
   <div>
     <vh-page :options="options">
-      <vh-scroller>
+      <vhTabel>
         <router-link to="/Hello-2" tag="a">
-          <h1 v-for="i in 15" :key='i'>{{ msg }}</h1>
+          <h1 v-for="i in sum" :key='i'>{{ msg }}</h1>
         </router-link>
-      </vh-scroller>
+      </vhTabel>
     </vh-page>
   </div>
 </template>
 
 <script>
+import vhTabel from './vh-tabel.vue'
 export default {
   name: 'demo-1',
   mounted () {
@@ -18,6 +19,7 @@ export default {
   },
   data () {
     return {
+      sum: 15,
       msg: 'Hello Vue 1!',
       options: {
         back: false,
@@ -32,6 +34,9 @@ export default {
     }
   },
   components: {
+    vhTabel
+  },
+  methods: {
   }
 }
 </script>

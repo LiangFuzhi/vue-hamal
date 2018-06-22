@@ -31,7 +31,7 @@ let upload = {
             resolve(state)
           } else {
             console.log('上传失败：' + data.responseText + '|' + status)
-            reject(state)
+            reject(data)
           }
         })
         task.addFile(path, {
@@ -67,14 +67,11 @@ let upload = {
    * @return {[obj]}          [Promise]
    */
   batchUpload: function (server, pathArray) {
-    console.log(pathArray)
     return Promise.reduce(pathArray, (total, fileName, index, length) => {
       if (fileName.src) {
         return this.upload(server, fileName.src, `${index + 1}/${length}`, index === 0, index + 1 === length)
           .then((contents) => {
-            total.push(Object.assign({}, pathArray[index], {
-              'id': contents
-            }))
+            total.push(Object.assign({}, pathArray[index], {'id': contents}))
             return total
           })
       } else {
@@ -90,32 +87,3 @@ let upload = {
 }
 
 export default upload
-
-// let upload1 = {
-//   upload: function(num = "1/1") {
-//     return new Promise((resolve, reject) => {
-//       setTimeout(()=>{
-//         resolve(num)
-//       },1000)
-//     });
-//   },
-//   batchUpload:function(){
-//     let pathArray = [1,2,3]
-//     return Promise.reduce(pathArray,(total, fileName, index, length)=> {
-//       return this.upload(`${fileName}/${length}`).then((contents)=> {
-//         total.push(contents)
-//         return total
-//       });
-//     }, []).then(function(total) {
-//       return Promise.resolve(total);
-//     }).catch((err)=>{
-//       return Promise.reject(err);
-//     });
-//   }
-// }
-//
-// upload1.batchUpload().then((e)=>{
-//   console.log(e);
-// }).catch((err)=>{
-//   console.log(err);
-// })

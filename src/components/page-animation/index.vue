@@ -3,6 +3,8 @@
     <!-- 实现右滑返回的历史页面 -->
     <div class="page back" ref="back"></div>
     <!-- end -->
+    <!-- 返回阴影 -->
+    <div class="page-shadow-effect" ref="shadow"></div>
     <transition
     @before-enter="beforeEnter"
     @enter="enter"
@@ -15,8 +17,6 @@
         <router-view class="page"></router-view>
       </keep-alive>
     </transition>
-    <!-- 返回阴影 -->
-    <div class="page-shadow-effect" ref="shadow"></div>
   </div>
 </template>
 
@@ -58,12 +58,15 @@ export default {
   mounted () {
     this.$nextTick(() => {
       this.handler()
+      setTimeout(() => {
+        this.$bus('onTransitionAfter')
+      })
     })
     this.back()
   },
   data () {
     return {
-      duration: 0.3 * 1000, // 动画持续时间
+      duration: 0.4 * 1000, // 动画持续时间
       leaveTarget: '', // 离开页面目标
       enterTarget: '', // 进入页面目标
       translateX: '100%',
@@ -121,10 +124,13 @@ export default {
     ...mapMutations(['SET_IS_DRAG_BACK', 'SET_IS_TRANSITION_AFTER']),
     handler () {
       var hammer = new Hammer(this.$refs.page, {
-        touchAction: 'none',
+        // touchAction: 'none',
         inputClass: Hammer.TouchInput,
         recognizers: [
-          [Hammer.Pan, { direction: Hammer.DIRECTION_HORIZONTAL }]
+          [Hammer.Pan, {
+            direction: Hammer.DIRECTION_HORIZONTAL,
+            threshold: 1
+          }]
         ]
       })
       hammer.on('panstart', this.onPanstart)
@@ -134,6 +140,9 @@ export default {
     // 开始进来
     beforeEnter (el) {
       el.removeAttribute('style')
+      if (this.history.direction === 'forward') {
+        el.style.transform = 'translate3d(0, 100%, 0)'
+      }
       this.SET_IS_TRANSITION_AFTER(false)
     },
     // 进入时
@@ -190,7 +199,7 @@ export default {
       this.SET_IS_TRANSITION_AFTER(true)
       setTimeout(() => {
         this.$bus('onTransitionAfter')
-      })
+      }, 100)
     },
     // 开始离开
     beforeLeave (el) {
@@ -238,17 +247,20 @@ export default {
     },
     // 离开后
     afterLeave (el) {
-
     },
     // 滑动开始
     onPanstart (e) {
-      if (!this.isBack && this.page.isDragBack && (e.direction === 4) && this.backEl) {
+      if (!this.isBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 20)) && this.backEl) {
+        this.enterTarget.el.style.touchAction = 'none'
+        e.preventDefault()
         this.isBack = true
+        this.onPanmove(e)
       }
     },
     // 滑动中
     onPanmove (e) {
       if (this.isBack) {
+        e.preventDefault()
         let scale = e.deltaX / document.body.clientWidth
         if (scale < 0) {
           scale = 0
@@ -263,6 +275,7 @@ export default {
     // 滑动结束
     onPanend (e) {
       if (this.isBack) {
+        e.preventDefault()
         let scale = e.deltaX / document.body.clientWidth
         let back, // 是否返回
           backTranslateX, // 返回页面的位置
@@ -271,13 +284,19 @@ export default {
           back = false
           enterTranslateX = '0%'
           backTranslateX = '-20%'
+          if (scale < 0) scale = 0
         } else {
           this.isPanBack = true
           back = true
           enterTranslateX = '100%'
           backTranslateX = '0%'
         }
-        let duration = Math.abs(this.duration * (1 - scale)) // 动画时间
+        let duration = 0 // 动画时间
+        if (back) {
+          duration = Math.abs(this.duration * (1 - scale))
+        } else {
+          duration = Math.abs(this.duration * scale)
+        }
         Velocity(this.enterTarget.el, {
           translateX: [enterTranslateX, `${scale * 100}%`]
         }, {
@@ -314,7 +333,10 @@ export default {
           translateX: translateX,
           opacity
         }, {
-          duration: duration
+          duration: duration,
+          complete: () => {
+            this.$refs.shadow.removeAttribute('style')
+          }
         })
       }
     },
@@ -328,6 +350,7 @@ export default {
     back () {
       this.plusReady(() => {
         window.plus.key.addEventListener('backbutton', () => {
+          if (this.isBack) return
           if (!this.page.isBack) {
             // 把应用切换到后台运行
             this.$native.moveTaskToBack()
@@ -373,16 +396,16 @@ export default {
   }
   .back {
     z-index: -1;
+    /* transform: translate3d(-100%, 0, 0); */
   }
   .page-shadow-effect {
     position: absolute;
     top: 0;
     width: 100%;
     bottom: 0;
-    z-index: -1;
+    /* z-index: -1; */
     content: '';
     opacity: 1;
-    /* z-index: 100; */
     right: 100%;
     background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.2) 100%);
   }

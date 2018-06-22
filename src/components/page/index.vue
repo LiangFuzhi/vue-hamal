@@ -12,7 +12,14 @@
     <!-- 页头 end-->
     <!-- 内容 -->
     <div class="vh-frame-main" :style="mainStyle" ref="main">
-      <slot></slot>
+      <slot v-if="show">
+        <div class="main">
+          <p>没有数据</p>
+        </div>
+      </slot>
+      <div class="load" v-else>
+        <span>正在加载</span>
+      </div>
     </div>
     <!-- 内容 end-->
     <!-- 页脚 -->
@@ -33,6 +40,7 @@ export default {
   name: 'vh-page',
   created () {
     this.path = this.$route.path
+    this.config.lazy && (this.show = false)
   },
   mounted () {
     this.$nextTick(() => {
@@ -54,13 +62,15 @@ export default {
       default: {
         back: true,
         backgroundColor: '#fff',
+        lazy: false,
         header: {}
       },
       main: {
         top: '44',
         bottom: '0'
       },
-      scrollTop: 0
+      scrollTop: 0,
+      show: true
     }
   },
   activated () {},
@@ -89,13 +99,16 @@ export default {
         } else {
           this.SET_IS_DRAG_BACK(false)
         }
+        this.config.lazy && (this.show = true)
       }
     }
   },
   props: {
     options: {
       type: Object,
-      default: () => {}
+      default: () => {
+        return {}
+      }
     }
   },
   methods: {
@@ -143,7 +156,6 @@ export default {
     width: 100%;
     background: #fff;
     overflow: hidden;
-    touch-action: pan-y;
   }
 
   .vh-frame-main {
@@ -159,6 +171,14 @@ export default {
     -webkit-user-drag: none;
     background-color: #fff;
   }
+  .main {
+    text-align: center;
+    height: 50px;
+    color: #666;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+  }
 
   footer {
     position: absolute;
@@ -168,7 +188,12 @@ export default {
     z-index: 10;
     background: #fff;
     overflow: hidden;
-    touch-action: pan-y;
   }
-
+  .load {
+    text-align: center;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>
