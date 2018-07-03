@@ -4,16 +4,16 @@
  *
  * 升级文件为JSON格式数据，如下：
 {
-    'appid':'HelloH5',
-    'iOS':{
-        'version':'iOS新版本号，如：1.0.0',
-        'note':'iOS新版本描述信息，多行使用\n分割',
-        'url':'Appstore路径，如：itms-apps://itunes.apple.com/cn/app/hello-h5+/id682211190?l=zh&mt=8'
+    "appid":"HelloH5",
+    "iOS":{
+        "version":"iOS新版本号，如：1.0.0",
+        "note":"iOS新版本描述信息，多行使用\n分割",
+        "url":"Appstore路径，如：itms-apps://itunes.apple.com/cn/app/hello-h5+/id682211190?l=zh&mt=8"
     },
-    'Android':{
-        'version':'Android新版本号，如：1.0.1',
-        'note':'Android新版本描述信息，多行使用\n分割',
-        'url':'apk文件下载地址，如：http://www.dcloud.io/helloh5p/HelloH5.apk'
+    "Android":{
+        "version":"Android新版本号，如：1.0.1",
+        "note":"Android新版本描述信息，多行使用\n分割",
+        "url":"apk文件下载地址，如：http://www.dcloud.io/helloh5p/HelloH5.apk"
     }
 }
  *
