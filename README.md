@@ -2,6 +2,32 @@
 
 > 基于vue + router + Vuex + hbuilder写的webapp快速构建工具，可以单独运行在web端。主要实现了页面切换管理
 
+<a href="https://github.com/airyland/vue-hamal/issues">
+  <img src="https://img.shields.io/github/issues/airyland/vue-hamal.svg?style=flat-square" alt="">
+</a>
+<a href="https://github.com/airyland/vue-hamal/issues">
+  <img src="http://isitmaintained.com/badge/resolution/airyland/vue-hamal.svg?style=flat-square" alt="">
+</a>
+<a href="https://github.com/airyland/vue-hamal/graphs/contributors">
+  <img src="https://img.shields.io/github/contributors/airyland/vue-hamal.svg?style=flat-square" alt="">
+</a>
+<br>
+<a href="https://www.npmjs.com/package/vue-hamal">
+  <img src="https://img.shields.io/npm/l/vue-hamal.svg?style=flat-square" alt="">
+</a>
+<a href="https://www.npmjs.com/package/vue-hamal">
+  <img src="https://img.shields.io/npm/v/vue-hamal.svg?style=flat-square" alt="">
+</a>
+<a href="https://www.npmjs.com/package/vue-hamal">
+  <img src="https://img.shields.io/npm/dm/vue-hamal.svg?style=flat-square" alt="">
+</a>
+<a href="https://www.npmjs.com/package/vue-hamal">
+  <img src="https://img.shields.io/npm/dt/vue-hamal.svg?style=flat-square" alt="">
+</a>
+
+## 在线例子
+[https://liangfuzhi.github.io/vue-hamal/dist/index.html](https://liangfuzhi.github.io/vue-hamal/dist/index.html)
+
 ## 如何使用
 npm
 ```
@@ -15,6 +41,7 @@ yarn add vue-hamal --save
 ## 基本用法
 
 main.js
+
 ``` javascript
 import Vue from 'vue'
 import router from '@/demo/router/index.js'
@@ -76,7 +103,9 @@ new Vue({
   store
 })
 ```
+
 router.js
+
 ``` javascript
 // 配置页面
 import Vue from 'vue'
@@ -100,12 +129,15 @@ export default new VueRouter({
 ```
 
 详细用法请看src/demo，也可以下载该项目看运行效果。
+
 ``` javascript
 yarn install 或 npm install
 // 然后
 yarn run dev 或 npm run dev
 ```
+
 添加了app的钩子
+
 ``` javascript
 // 前进打开页面执行
 forward () {
