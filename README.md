@@ -13,6 +13,7 @@ yarn add vue-hamal --save
 ```
 
 ## 基本用法
+
 main.js
 ``` javascript
 import Vue from 'vue'
