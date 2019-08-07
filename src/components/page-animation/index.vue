@@ -1,22 +1,31 @@
+/*
+ * @Author: LFZ
+ * @Date: 2019-04-17 18:13:49
+ * @Last Modified by: LFZ
+ * @Last Modified time: 2019-06-21 13:43:45
+ * @Description: 页面动画
+ */
 <template>
-  <div ref="page" class="page-touch">
-    <!-- 实现右滑返回的历史页面 -->
-    <div class="page back" ref="back"></div>
-    <!-- end -->
-    <!-- 返回阴影 -->
-    <div class="page-shadow-effect" ref="shadow"></div>
-    <transition
-    @before-enter="beforeEnter"
-    @enter="enter"
-    @after-enter="afterEnter"
-    @before-leave="beforeLeave"
-    @leave="leave"
-    @after-leave="afterLeave"
-    :css="false">
-      <keep-alive>
-        <router-view class="page"></router-view>
-      </keep-alive>
-    </transition>
+  <div ref="bubble">
+    <div ref="page" class="page-touch">
+      <!-- 实现右滑返回的历史页面 -->
+      <div class="page back" ref="back"></div>
+      <!-- end -->
+      <!-- 返回阴影 -->
+      <div class="page-shadow-effect" ref="shadow"></div>
+      <transition
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @after-enter="afterEnter"
+      @before-leave="beforeLeave"
+      @leave="leave"
+      @after-leave="afterLeave"
+      :css="false">
+        <keep-alive>
+          <router-view class="page"></router-view>
+        </keep-alive>
+      </transition>
+    </div>
   </div>
 </template>
 
@@ -72,33 +81,20 @@ export default {
       translateX: '100%',
       backEl: '', // 历史页面对象
       isBack: false, // 是否正在返回
-      isPanBack: false // 是否正在滑动返回
+      isPanBack: false, // 是否正在滑动返回
+      disableDragBack: false // 禁用拖拉返回
     }
   },
   computed: {
-    ...mapState(['history', 'device', 'page']),
-    transition () {
-      return [this.animation + 'In', this.animation + 'Out']
-    }
+    ...mapState(['history', 'device', 'page'])
   },
   watch: {
-    'history.direction' (direction) {
-      switch (direction) {
-        case 'forward':
-          this.transitionName = this.transition[0]
-          break
-        case 'reverse':
-          this.transitionName = this.transition[1]
-          break
-        default:
-      }
-    },
     'history.record' (record) {
       if (record.length > 1) {
         // this.backEl = record[record.length - 2].el.firstChild.cloneNode(true)
         this.backEl = {
           el: record[record.length - 2].el.cloneNode(true),
-          scrollTop: record[record.length - 2].instances.$children[0].scrollTop
+          scrollTop: record[record.length - 2].scrollTop
         }
       } else {
         this.backEl = ''
@@ -113,7 +109,10 @@ export default {
           this.$refs.back.appendChild(backEl.el)
           if (backEl.scrollTop) {
             setTimeout(() => {
-              this.$refs.back.getElementsByClassName('vh-frame-main')[0].scrollTop = backEl.scrollTop
+              let scroller = this.$refs.back.getElementsByClassName('vh-scroller')
+              for (const iterator of scroller) {
+                iterator.scrollTop = backEl.scrollTop
+              }
             }, 0)
           }
         }
@@ -124,32 +123,49 @@ export default {
     ...mapMutations(['SET_IS_DRAG_BACK', 'SET_IS_TRANSITION_AFTER']),
     handler () {
       var hammer = new Hammer(this.$refs.page, {
-        // touchAction: 'none',
+        touchAction: 'auto',
         inputClass: Hammer.TouchInput,
         recognizers: [
           [Hammer.Pan, {
-            direction: Hammer.DIRECTION_HORIZONTAL,
-            threshold: 1
+            threshold: 0,
+            pointers: 0
           }]
         ]
       })
-      hammer.on('panstart', this.onPanstart)
-      hammer.on('panmove', this.onPanmove)
-      hammer.on('panend', this.onPanend)
+      hammer.on('panstart', this.onPanstart, { passive: false })
+      hammer.on('panmove', this.onPanmove, { passive: false })
+      hammer.on('panend', this.onPanend, { passive: false })
+      // this.$refs.bubble.addEventListener('touchstart', (e) => {
+      //   // e.preventDefault()
+      //   e.stopPropagation()
+      // }, false)
+      // this.$refs.bubble.addEventListener('touchmove', (e) => {
+      //   // e.preventDefault()
+      //   e.stopPropagation()
+      // }, false)
+      // this.$refs.bubble.addEventListener('touchend', (e) => {
+      //   // e.preventDefault()
+      //   e.stopPropagation()
+      // }, false)
     },
     // 开始进来
     beforeEnter (el) {
       el.removeAttribute('style')
+      this.enterTarget = {
+        el: el
+      }
       if (this.history.direction === 'forward') {
-        el.style.transform = 'translate3d(0, 100%, 0)'
+        if (!this.history.iosBack || this.history.animation) {
+          el.style.transform = 'translate3d(0, 100%, 0)'
+        }
       }
       this.SET_IS_TRANSITION_AFTER(false)
     },
     // 进入时
     enter (el, done) {
-      this.enterTarget = {
-        el: el,
-        done: done
+      if (this.history.iosBack || !this.history.animation) {
+        done()
+        return
       }
       switch (this.history.direction) {
         case 'forward':
@@ -158,17 +174,13 @@ export default {
             translateX: ['0%', '100%']
           }, {
             duration: this.duration,
-            complete: () => {
-              el.removeAttribute('style')
-              done()
-            }
+            complete: done
           })
           this.onAnimateShadow(['0%', '100%'], ['1', '0'], this.duration)
           break
         case 'reverse':
           // 控制左边页面
           if (this.isPanBack) {
-            el.removeAttribute('style')
             done()
           } else {
             el.style.zIndex = '-1'
@@ -177,14 +189,10 @@ export default {
                 translateX: ['0%', '-20%']
               }, {
                 duration: this.duration,
-                complete: () => {
-                  el.removeAttribute('style')
-                  done()
-                }
+                complete: done
               })
             } else {
               setTimeout(() => {
-                el.removeAttribute('style')
                 done()
               }, this.duration)
             }
@@ -194,12 +202,17 @@ export default {
       }
     },
     // 进入后
-    afterEnter () {
+    afterEnter (el) {
       this.isPanBack = false
       this.SET_IS_TRANSITION_AFTER(true)
-      setTimeout(() => {
+      if (this.history.iosBack || !this.history.animation) {
+        setTimeout(() => {
+          this.$bus('onTransitionAfter')
+        }, 100)
+      } else {
         this.$bus('onTransitionAfter')
-      }, 100)
+      }
+      el.removeAttribute('style')
     },
     // 开始离开
     beforeLeave (el) {
@@ -207,6 +220,10 @@ export default {
     },
     // 离开时
     leave (el, done) {
+      if (this.history.iosBack || !this.history.animation) {
+        done()
+        return
+      }
       switch (this.history.direction) {
         case 'forward':
           // 控制左边页面
@@ -247,12 +264,16 @@ export default {
     },
     // 离开后
     afterLeave (el) {
+      el.removeAttribute('style')
+      // el.style.display = 'none'
     },
     // 滑动开始
     onPanstart (e) {
-      if (!this.isBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 20)) && this.backEl) {
-        this.enterTarget.el.style.touchAction = 'none'
+      if (this.enterTarget && !this.isBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 45)) && this.backEl) {
+        // this.enterTarget.el.style.touchAction = 'none'
         e.preventDefault()
+        // e.cancelBubble = true
+        // e.stopPropagation()
         this.isBack = true
         this.onPanmove(e)
       }
@@ -261,6 +282,8 @@ export default {
     onPanmove (e) {
       if (this.isBack) {
         e.preventDefault()
+        // e.cancelBubble = true
+        // e.stopPropagation()
         let scale = e.deltaX / document.body.clientWidth
         if (scale < 0) {
           scale = 0
@@ -276,6 +299,8 @@ export default {
     onPanend (e) {
       if (this.isBack) {
         e.preventDefault()
+        // e.cancelBubble = true
+        // e.stopPropagation()
         let scale = e.deltaX / document.body.clientWidth
         let back, // 是否返回
           backTranslateX, // 返回页面的位置
@@ -303,14 +328,15 @@ export default {
           duration: duration,
           complete: () => {
             if (back) {
-              if (this.history.record.length > 1) {
-                this.$router.push(this.history.record[this.history.record.length - 2])
-              }
+              this.$router.back()
+              // if (this.history.record.length > 1) {
+              //   this.$router.push(this.history.record[this.history.record.length - 2])
+              // }
             }
             setTimeout(() => {
               this.isBack = false
             }, 0)
-            this.SET_IS_DRAG_BACK(true)
+            // this.SET_IS_DRAG_BACK(true)
           }
         })
         this.onAnimateShadow([enterTranslateX, `${scale * 100}%`], '0', duration)
@@ -407,6 +433,7 @@ export default {
     content: '';
     opacity: 1;
     right: 100%;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.2) 100%);
+    background: rgba(0, 0, 0, 0.05);
+    /* background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.2) 100%); */
   }
 </style>

@@ -9,7 +9,7 @@
  * ("yyyy-MM-dd EEE hh:mm:ss") ==> 2009-03-10 星期二 08:09:04
  * ("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18
  */
-module.exports = function (date, fmt = 'YYYY-MM-DD HH:mm:ss') {
+export default function (date, fmt = 'YYYY-MM-DD HH:mm:ss') {
   if (!date) {
     return ''
   }

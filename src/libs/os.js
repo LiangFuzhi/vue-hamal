@@ -1,3 +1,10 @@
+/*
+ * @Author: LFZ
+ * @Date: 2019-04-17 18:15:21
+ * @Last Modified by: LFZ
+ * @Last Modified time: 2019-04-30 11:24:32
+ * @Description: 系统信息
+ */
 let os = {}
 let ua = navigator.userAgent
 function isAndroid () { // android
@@ -23,6 +30,16 @@ function isIos () { // ios
     }
   }
 }
+
+function isWx () {
+  var wx = ua.match(/MicroMessenger/i)
+  if (wx) {
+    os.wx = true
+  } else {
+    os.wx = false
+  }
+}
 isAndroid()
 isIos()
+isWx()
 export default os

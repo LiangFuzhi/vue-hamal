@@ -17,14 +17,14 @@ function difference (newDate, createDate) {
   var days = Math.floor(diff / (24 * 3600 * 1000))
 
   // 计算出小时数
-  var leave1 = diff % (24 * 3600 * 1000)    // 计算天数后剩余的毫秒数
+  var leave1 = diff % (24 * 3600 * 1000) // 计算天数后剩余的毫秒数
   var hours = Math.floor(leave1 / (3600 * 1000))
   // 计算相差分钟数
-  var leave2 = leave1 % (3600 * 1000)        // 计算小时数后剩余的毫秒数
+  var leave2 = leave1 % (3600 * 1000) // 计算小时数后剩余的毫秒数
   var minutes = Math.floor(leave2 / (60 * 1000))
 
   // 计算相差秒数
-  var leave3 = leave2 % (60 * 1000)      // 计算分钟数后剩余的毫秒数
+  var leave3 = leave2 % (60 * 1000) // 计算分钟数后剩余的毫秒数
   var seconds = Math.round(leave3 / 1000)
   // console.log(newDate);
   // console.log(createDate);

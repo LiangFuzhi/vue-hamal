@@ -4,7 +4,6 @@ import router from '@/demo/router/index.js'
 
 import vueHamal from 'vue-hamal'
 import App from './App'
-import FastClick from 'fastclick'
 import * as consoleLog from '@/demo/assets/js/log.js'
 // import VueTouch from 'vue-touch'
 import Vuex from 'vuex'
@@ -30,8 +29,6 @@ window.Promise.prototype.catch = function (onRejected) {
   })
 }
 consoleLog.buddha()
-// 删除点击延时
-FastClick.attach(document.body)
 Vue.use(Vuex)
 let store = new Vuex.Store({
   strict: false

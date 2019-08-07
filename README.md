@@ -117,9 +117,9 @@ const routes = [{
   path: '',
   component: vhPageAnimation,
   children: [
-    {path: '/', component: () => import('@/demo/components/Hello-1.vue')},
-    {path: '/Hello-2', component: () => import('@/demo/components/Hello-2.vue')},
-    {path: '/Hello-3', component: () => import('@/demo/components/Hello-3.vue')}
+    {path: '/', component: () => import('@/demo/components/Hello-1.vue'), meta: {level: 0, animation: false}},
+    {path: '/Hello-2', component: () => import('@/demo/components/Hello-2.vue'), meta: {level: 1, animation: false}},
+    {path: '/Hello-3', component: () => import('@/demo/components/Hello-3.vue'), meta: {level: 2, animation: false}}
   ]
 }]
 

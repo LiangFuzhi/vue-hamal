@@ -1,8 +1,8 @@
 <template>
   <div>
-    <vh-page :options="{title:'页面-3',back:true}">
+    <vh-page :options="options">
       <!-- <router-link slot="main" to="/Hello-2" tag="a"> -->
-        <h1 v-for="i in 15" :key='i'>{{ msg }}</h1>
+        <h1 v-for="i in 150" :key='i'>{{ msg }}</h1>
       <!-- </router-link> -->
     </vh-page>
   </div>
@@ -13,7 +13,17 @@ export default {
   name: 'demo-3',
   data () {
     return {
-      msg: 'Hello Vue 3!'
+      msg: 'Hello Vue 3!',
+      options: {
+        back: true,
+        backgroundColor: '#eee',
+        header: {
+          title: '页面-3',
+          back: true,
+          backgroundColor: '#fff',
+          color: '#000'
+        }
+      }
     }
   },
   components: {}

@@ -1,3 +1,10 @@
+/*
+ * @Author: LFZ
+ * @Date: 2019-04-17 18:14:52
+ * @Last Modified by: LFZ
+ * @Last Modified time: 2019-04-17 18:14:52
+ * @Description: 页面头部
+ */
 <template>
   <div class="hamal-header" :style="hamalHeaderStyle" v-if="config.show">
     <div class="hamal-header-left" @click="onBack">
@@ -27,39 +34,42 @@ export default {
   components: {
   },
   created () {
+    this.config = {
+      ...this.config,
+      ...this.options
+    }
     this.path = this.$route.path
+  },
+  forward () {
+    this.setBack()
+  },
+  back () {
+    this.setBack()
   },
   eventBus: {
     onTransitionAfter () {
-      if ((this.history.activate === this.path)) {
-        if (this.config.back) {
-          this.SET_IS_BACK(true)
-        } else {
-          this.SET_IS_BACK(false)
-        }
-      }
     }
   },
   data () {
     return {
       path: '',
-      default: {
+      config: {
         back: true,
         backgroundColor: '#fff',
         color: '#000',
-        show: true
+        show: true,
+        title: ''
       }
     }
   },
-  watch: {},
+  metaInfo () {
+    return {
+      title: this.config.title,
+      titleTemplate: null
+    }
+  },
   computed: {
     ...mapState(['device', 'history']),
-    config () {
-      return {
-        ...this.default,
-        ...this.options
-      }
-    },
     hamalHeaderStyle () {
       return {
         backgroundColor: this.config.backgroundColor,
@@ -75,12 +85,30 @@ export default {
       }
     }
   },
+  watch: {
+    options (val) {
+      this.config = {
+        ...this.config,
+        ...val
+      }
+    }
+  },
   methods: {
     ...mapMutations(['SET_IS_BACK']),
+    setBack () {
+      // if ((this.history.activate === this.path)) {
+      if (this.config.back) {
+        this.SET_IS_BACK(true)
+      } else {
+        this.SET_IS_BACK(false)
+      }
+      // }
+    },
     onBack () {
       if (!this.config.back) return
       if (this.history.record.length > 1) {
-        this.$router.push(this.history.record[this.history.record.length - 2])
+        this.$router.back()
+        // this.$router.push(this.history.record[this.history.record.length - 2])
       }
     }
   }

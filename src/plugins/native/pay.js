@@ -1,4 +1,4 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 import plusReady from '../../libs/plusReady.js'
 let pays = {} // 当前手机支持的支付方式
 let pay = {
@@ -17,11 +17,11 @@ let pay = {
           // alert(JSON.stringify(result));
           cb && cb(result)
         }, function (e) {
-          if (e.message.indexOf('6001') > -1 || e.message.indexOf('62001') > -1 || e.message.indexOf('-2') > -1) {
-            Vue.$vux.toast.text(`用户取消支付`)
-          } else {
-            Vue.$vux.toast.text(`${e.message}`)
-          }
+          // if (e.message.indexOf('6001') > -1 || e.message.indexOf('62001') > -1 || e.message.indexOf('-2') > -1) {
+          //   Vue.$vux.toast.text(`用户取消支付`)
+          // } else {
+          //   Vue.$vux.toast.text(`${e.message}`)
+          // }
           // alert(`[${e.code}]：${e.message}`);
           console.log(`[${e.code}]：${e.message}`)
           err && err(e)

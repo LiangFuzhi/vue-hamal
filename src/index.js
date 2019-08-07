@@ -1,4 +1,5 @@
-import FastClick from 'fastclick'
+import FastClick from '../src/libs/fastclick.js'
+import Meta from 'vue-meta'
 
 import vhPageAnimation from '../src/components/page-animation/index.vue'
 import vhPage from '../src/components/page/index.vue'
@@ -15,7 +16,7 @@ import vhVueHook from '../src/plugins/vue-hook/index.js'
 
 import { warn } from '../src/tools/debug.js'
 
-FastClick.attach(document.body)
+let fastClick = FastClick.attach(document.body)
 
 const components = [
   vhPageAnimation,
@@ -25,10 +26,11 @@ const components = [
 ]
 
 const install = function (Vue, opts = {}) {
+  Vue.$fastClick = fastClick
   components.map(component => {
     Vue.component(component.name, component)
   })
-
+  Vue.use(Meta)
   Vue.use(vhVueEventBus)
   // Vue.use(vhAjax)
   Vue.use(vhVueHook)
@@ -62,18 +64,25 @@ const install = function (Vue, opts = {}) {
     }
   }
 
-  window.Promise.prototype.catch = function (rejected) {
-    return this.then(null, (err) => {
-      // console.error('Promise error:', err)
-      if (err) {
-        Vue.$log.write({
-          'error': err,
-          'remarks': 'Promise error'
-        })
-      }
-      rejected(err)
+  // window.Promise.prototype.catch = function (rejected) {
+  //   return this.then(null, (err) => {
+  //     // console.error('Promise error:', err)
+  //     if (err) {
+  //       Vue.$log.write({
+  //         'error': err,
+  //         'remarks': 'Promise error'
+  //       })
+  //     }
+  //     rejected(err)
+  //   })
+  // }
+
+  window.addEventListener('unhandledrejection', function (event) {
+    Vue.$log.write({
+      'stack': event.reason.stack,
+      'type': 'unhandledrejection'
     })
-  }
+  })
 }
 
 export {

@@ -1,25 +1,35 @@
+/*
+ * @Author: LFZ
+ * @Date: 2019-04-17 18:14:04
+ * @Last Modified by: LFZ
+ * @Last Modified time: 2019-08-02 15:34:00
+ * @Description: 页面主题
+ */
 <template>
   <div class="vh-frame" ref="page">
+    <slot name="top"></slot>
     <!-- 页头 -->
     <header ref="header">
       <slot name="header">
+        <slot name="header-top"></slot>
         <vh-header :options="config.header">
           <slot name="header-title"></slot>
           <slot name="header-right" slot="header-right"></slot>
         </vh-header>
+        <slot name="header-bottom"></slot>
       </slot>
     </header>
     <!-- 页头 end-->
     <!-- 内容 -->
-    <div class="vh-frame-main" :style="mainStyle" ref="main">
+    <div class="vh-frame-main vh-scroller" :style="mainStyle" ref="main">
       <slot v-if="show">
         <div class="main">
           <p>没有数据</p>
         </div>
       </slot>
-      <div class="load" v-else>
+      <!-- <div class="load" v-else>
         <span>正在加载</span>
-      </div>
+      </div> -->
     </div>
     <!-- 内容 end-->
     <!-- 页脚 -->
@@ -27,31 +37,61 @@
       <slot name="footer"></slot>
     </footer>
     <!-- 页脚 end-->
+    <slot name="bottom"></slot>
   </div>
 </template>
 
 <script>
 import vhHeader from './header.vue'
+import nprogress from 'nprogress'
 import {
   mapState,
   mapMutations
 } from 'vuex'
 export default {
   name: 'vh-page',
+  beforeCreate () {},
   created () {
+    this.config = {
+      ...this.config,
+      ...this.options
+    }
+    if (!this.history.firstOpen) {
+      nprogress.start()
+      this.SET_LAZY(this.config.lazy)
+      this.config.lazy && (this.show = false)
+    } else {
+      this.SET_LAZY(false)
+    }
     this.path = this.$route.path
-    this.config.lazy && (this.show = false)
+    window.addEventListener('resize', () => {
+      if (this.history.activate === this.path) {
+        setTimeout(this.getHeadAndFeetHeight, 100)
+      }
+    }, false)
   },
   mounted () {
     this.$nextTick(() => {
       this.getHeadAndFeetHeight()
       this.onScroll()
+      if (!this.history.firstOpen) {
+        setTimeout(() => {
+          nprogress.done()
+        }, this.history.animation ? 400 : 0)
+        if (this.config.lazy && !this.show) {
+          setTimeout(() => {
+            this.show = true
+          }, this.history.animation ? 400 : 0)
+        }
+      }
     })
   },
   forward () {
+    this.setBack()
   },
   back () {
     this.onRecoveryScroll()
+    this.setBack()
   },
   components: {
     vhHeader
@@ -59,10 +99,10 @@ export default {
   data () {
     return {
       path: '',
-      default: {
+      config: {
         back: true,
         backgroundColor: '#fff',
-        lazy: false,
+        lazy: true,
         header: {}
       },
       main: {
@@ -74,15 +114,16 @@ export default {
     }
   },
   activated () {},
-  watch: {},
+  watch: {
+    options (val) {
+      this.config = {
+        ...this.config,
+        ...val
+      }
+    }
+  },
   computed: {
     ...mapState(['device', 'history']),
-    config () {
-      return {
-        ...this.default,
-        ...this.options
-      }
-    },
     mainStyle () {
       return {
         top: `${this.main.top}px`,
@@ -92,16 +133,7 @@ export default {
     }
   },
   eventBus: {
-    onTransitionAfter () {
-      if ((this.history.activate === this.path)) {
-        if (this.config.back) {
-          this.SET_IS_DRAG_BACK(true)
-        } else {
-          this.SET_IS_DRAG_BACK(false)
-        }
-        this.config.lazy && (this.show = true)
-      }
-    }
+    onTransitionAfter () {}
   },
   props: {
     options: {
@@ -112,7 +144,17 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['SET_IS_DRAG_BACK']),
+    ...mapMutations(['SET_IS_DRAG_BACK', 'SET_SCROLL_TOP', 'SET_LAZY']),
+    // 设置是否允许返回
+    setBack () {
+      // if ((this.history.activate === this.path)) {
+      if (this.config.back) {
+        this.SET_IS_DRAG_BACK(true)
+      } else {
+        this.SET_IS_DRAG_BACK(false)
+      }
+      // }
+    },
     // 获取头和脚高度
     getHeadAndFeetHeight () {
       if (!this.fullScreen) {
@@ -127,6 +169,10 @@ export default {
       if (!this.$refs.main) return
       this.$refs.main.onscroll = (e) => {
         this.scrollTop = e.target.scrollTop
+        this.SET_SCROLL_TOP({
+          path: this.$route.path,
+          scrollTop: e.target.scrollTop
+        })
       }
     },
     // 恢复滚动位置
@@ -139,6 +185,9 @@ export default {
   }
 }
 </script>
+<style>
+@import 'nprogress/nprogress.css';
+</style>
 <style scoped>
   .vh-frame {
     height: 100%;
@@ -164,7 +213,6 @@ export default {
     box-sizing: border-box;
     position: absolute;
     width: 100%;
-    /* touch-action: pan-y; */
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     /* user-zoom: none; */

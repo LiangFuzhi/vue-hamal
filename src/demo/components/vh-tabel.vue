@@ -1,6 +1,6 @@
 <template>
   <vh-scroller ref="vhScroller" @on-loading="onLoading" @on-refresh="onRefresh">
-    <slot></slot>
+    <slot :sum="sum"></slot>
   </vh-scroller>
 </template>
 
@@ -15,7 +15,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         total: 0
-      }
+      },
+      sum: 15
     }
   },
   computed: {},
@@ -37,10 +38,12 @@ export default {
     onLoading () {
       console.log('触发加载更多')
       setTimeout(() => {
-        this.sum = this.sum + 10
-        this.$refs.vhScroller.onReset()
-        // this.$refs.vhScroller.onPauseLoading()
-        // this.$refs.vhScroller.onRecoveryLoading()
+        if (this.sum > 50) {
+          this.$refs.vhScroller.onPauseLoading()
+        } else {
+          this.sum += 10
+          this.$refs.vhScroller.onRecoveryLoading()
+        }
       }, 1000)
     }
   }

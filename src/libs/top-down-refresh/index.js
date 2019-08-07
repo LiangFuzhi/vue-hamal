@@ -49,9 +49,9 @@ const topDownRefreshMixin = {
         }).then((response) => {
           cb && cb(response.data)
         })
-        .catch((e) => {
-          err && err(e.response)
-        })
+          .catch((e) => {
+            err && err(e.response)
+          })
       }
     },
     // 获取数据页数
@@ -64,9 +64,9 @@ const topDownRefreshMixin = {
           this.pageCount = response.data.ret
           cb && cb()
         })
-        .catch((e) => {
-          err && err(e.response)
-        })
+          .catch((e) => {
+            err && err(e.response)
+          })
       }
     },
     // 下拉刷新

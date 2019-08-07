@@ -2,14 +2,17 @@
   <div>
     <vh-page :options="options">
       <div slot="header-right" @click="click">提交</div>
-      <router-link to="/Hello-3" tag="a">
-        <h1 v-for="i in 15" :key='i'>{{ msg }}</h1>
-      </router-link>
+      <vhTabel>
+        <router-link to="/Hello-3" tag="a">
+          <h1 v-for="i in 150" :key='i'>{{ msg }}</h1>
+        </router-link>
+      </vhTabel>
     </vh-page>
   </div>
 </template>
 
 <script>
+import vhTabel from './vh-tabel.vue'
 export default {
   name: 'demo-2',
   data () {
@@ -30,7 +33,9 @@ export default {
   forward () {
     // Object.assign(this.$data, this.$options.data())
   },
-  components: {},
+  components: {
+    vhTabel
+  },
   methods: {
     click () {
       this.msg = 'Hello Vue 2-2!'

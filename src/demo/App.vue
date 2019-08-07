@@ -1,7 +1,5 @@
 <template>
-  <div>
-      <router-view></router-view>
-  </div>
+  <vh-page-animation></vh-page-animation>
 </template>
 
 <script>

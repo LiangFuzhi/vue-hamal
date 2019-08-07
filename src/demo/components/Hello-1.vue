@@ -1,13 +1,16 @@
 <template>
-  <div>
+  <!-- <div>
     <vh-page :options="options">
-      <vhTabel>
-        <router-link to="/Hello-2" tag="a">
+      <vh-tabel>
+        <router-link to="/Hello-2" tag="a" slot-scope="{sum}">
           <h1 v-for="i in sum" :key='i'>{{ msg }}</h1>
         </router-link>
-      </vhTabel>
+      </vh-tabel>
     </vh-page>
-  </div>
+  </div> -->
+  <keep-alive>
+    <router-view></router-view>
+  </keep-alive>
 </template>
 
 <script>
@@ -19,7 +22,7 @@ export default {
   },
   data () {
     return {
-      sum: 15,
+      // sum: 15,
       msg: 'Hello Vue 1!',
       options: {
         back: false,

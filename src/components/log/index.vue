@@ -1,3 +1,10 @@
+/*
+ * @Author: LFZ
+ * @Date: 2019-04-17 18:15:04
+ * @Last Modified by: LFZ
+ * @Last Modified time: 2019-04-17 18:15:04
+ * @Description: 错误日志
+ */
 <template>
 <div>
   <vh-page :options="{title:'错误日志'}">
