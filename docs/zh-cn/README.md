@@ -29,7 +29,7 @@
 [https://liangfuzhi.github.io/vue-hamal/dist/index.html](https://liangfuzhi.github.io/vue-hamal/dist/index.html)
 
 ## 在线文档
-[https://liangfuzhi.github.io/vue-hamal/docs/index.html](https://liangfuzhi.github.io/vue-hamal/docs/index.html)
+[https://liangfuzhi.github.io/vue-hamal/docs](https://liangfuzhi.github.io/vue-hamal/docs)
 
 ## 如何使用
 npm

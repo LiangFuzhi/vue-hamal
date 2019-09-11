@@ -2,16 +2,16 @@
 
 > 基于vue + router + Vuex + hbuilder写的webapp快速构建工具，可以单独运行在web端。主要实现了页面切换管理
 
-<a href="https://github.com/airyland/vue-hamal/issues">
-  <img src="https://img.shields.io/github/issues/airyland/vue-hamal.svg?style=flat-square" alt="">
+<a href="https://github.com/LiangFuzhi/vue-hamal/issues">
+  <img src="https://img.shields.io/github/issues/LiangFuzhi/vue-hamal.svg?style=flat-square" alt="">
 </a>
-<a href="https://github.com/airyland/vue-hamal/issues">
-  <img src="http://isitmaintained.com/badge/resolution/airyland/vue-hamal.svg?style=flat-square" alt="">
+<a href="https://github.com/LiangFuzhi/vue-hamal/issues">
+  <img src="http://isitmaintained.com/badge/resolution/LiangFuzhi/vue-hamal.svg?style=flat-square" alt="">
 </a>
-<a href="https://github.com/airyland/vue-hamal/graphs/contributors">
-  <img src="https://img.shields.io/github/contributors/airyland/vue-hamal.svg?style=flat-square" alt="">
+<a href="https://github.com/LiangFuzhi/vue-hamal/graphs/contributors">
+  <img src="https://img.shields.io/github/contributors/LiangFuzhi/vue-hamal.svg?style=flat-square" alt="">
 </a>
-<br>
+<br/>
 <a href="https://www.npmjs.com/package/vue-hamal">
   <img src="https://img.shields.io/npm/l/vue-hamal.svg?style=flat-square" alt="">
 </a>
@@ -27,6 +27,9 @@
 
 ## 在线例子
 [https://liangfuzhi.github.io/vue-hamal/dist/index.html](https://liangfuzhi.github.io/vue-hamal/dist/index.html)
+
+## 在线文档
+[https://liangfuzhi.github.io/vue-hamal/docs](https://liangfuzhi.github.io/vue-hamal/docs)
 
 ## 如何使用
 npm
