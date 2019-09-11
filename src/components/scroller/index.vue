@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-08-05 14:47:19
+ * @Last Modified time: 2019-09-11 10:49:39
  * @Description: 滚动组件
  */
 <template>
@@ -44,17 +44,16 @@ export default {
   components: {},
   data () {
     return {
+      el: {
+        up: '',
+        down: ''
+      }, // 目标dom
+      deltaY: 0, // 位置
+      offsetY: 0, // 偏移量
+      disable: false, // 禁用
+      run: false, // 运行
+      damp: 0.6, // 阻尼
       default: {
-        el: {
-          up: '',
-          down: ''
-        }, // 目标dom
-        currentAction: '', // 当前操作 down up
-        deltaY: 0, // 位置
-        offsetY: 0, // 偏移量
-        disable: false, // 禁用
-        run: false, // 运行
-        damp: 0.6, // 阻尼
         up: {
           deltaY: 60, // 悬停位置
           trigger: 50, // 触发位置
@@ -109,8 +108,8 @@ export default {
     ...mapMutations(['SET_SCROLL_TOP']),
     // hammer处理器
     hammerHandler () {
-      this.config.el.main = this.$refs.content
-      this.config.el.up = this.$refs.up
+      this.el.main = this.$refs.content
+      this.el.up = this.$refs.up
       var hammer = new Hammer(this.$refs.content, {
         touchAction: 'auto',
         inputClass: Hammer.TouchInput,
@@ -127,22 +126,22 @@ export default {
     },
     // 滑动开始
     onPanStart (event) {
-      if (this.config.disable) return
-      if (this.config.run) return
+      if (this.disable) return
+      if (this.run) return
       if ((event.direction !== 16) || (Math.abs(event.angle) < 45) || (this.scrollTop !== 0)) {
-        this.config.disable = true
+        this.disable = true
         return
       }
       event.preventDefault()
-      this.config.run = true
+      this.run = true
       this.onPanMove(event)
     },
     // 滑动中
     onPanMove (event) {
-      if (this.config.disable) return
+      if (this.disable) return
       if (event.deltaY > 0) {
         if (this.scrollTop !== 0) {
-          this.config.offsetY = event.deltaY
+          this.offsetY = event.deltaY
         } else {
           event.preventDefault()
           this.pandownHandler(event)
@@ -151,12 +150,12 @@ export default {
     },
     // 滑动结束
     onPanEnd (event) {
-      if (this.config.disable) {
-        this.config.disable = false
+      if (this.disable) {
+        this.disable = false
         return
       }
-      this.config.offsetY = 0
-      if (this.config.deltaY > this.config.up.trigger) {
+      this.offsetY = 0
+      if (this.deltaY > this.config.up.trigger) {
         this.onRefresh()
       } else {
         this.onReset(false)
@@ -166,7 +165,7 @@ export default {
     pandownHandler (event) {
       let limit = this.config.up.deltaY
       // 计算位置
-      let slideY = (event.deltaY - this.config.offsetY) * this.config.damp
+      let slideY = (event.deltaY - this.offsetY) * this.damp
       if (slideY > limit) {
         slideY = limit
       }
@@ -176,7 +175,7 @@ export default {
         this.config.up.state = 0
       }
       this.onMove(slideY)
-      this.config.deltaY = slideY
+      this.deltaY = slideY
     },
     // 上拉处理器
     panupHandler (e) {
@@ -189,33 +188,33 @@ export default {
     // 移动main
     onMove (slideY) {
       let style = `translate3d(0, ${slideY}px, 0)`
-      this.config.el.up.style.transform = style
-      this.config.el.main.style.transform = style
+      this.el.up.style.transform = style
+      this.el.main.style.transform = style
     },
     // 重置
     onReset (delay = true) {
       if (this.config.up.loading) {
         this.config.up.state = 3
       }
-      Velocity(this.config.el.main, {
-        translateY: [0, `${this.config.deltaY}px`]
+      Velocity(this.el.main, {
+        translateY: [0, `${this.deltaY}px`]
       }, {
         duration: this.config.up.duration,
         delay: delay ? this.config.up.delay : 0,
         complete: () => {
           this.config.up.loading = false
-          this.config.disable = false
-          this.config.run = false
-          this.config.el.main.style.transform = ''
+          this.disable = false
+          this.run = false
+          this.el.main.style.transform = ''
         }
       })
-      Velocity(this.config.el.up, {
-        translateY: [0, `${this.config.deltaY}px`]
+      Velocity(this.el.up, {
+        translateY: [0, `${this.deltaY}px`]
       }, {
         duration: this.config.up.duration,
         delay: delay ? this.config.up.delay : 0
       })
-      this.config.deltaY = 0
+      this.deltaY = 0
       if (delay) this.onRecoveryLoading()
     },
     // 触发刷新
