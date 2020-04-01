@@ -8,7 +8,8 @@ export default (store, router) => {
       record: [], // 浏览记录
       activate: '/', // 当前路径
       animation: false, // 是否动画
-      lazy: true // 是否懒加载
+      lazy: true, // 是否懒加载
+      routerState: null // 路由状态
     },
     mutations: {
       SET_IOS_BACK (state, payload) {
@@ -42,12 +43,15 @@ export default (store, router) => {
       },
       SET_LAZY (state, payload) {
         state.lazy = payload
+      },
+      SET_ROUTER_STATE (state, payload) {
+        state.routerState = payload
       }
     },
     actions: {
       // 判断浏览前进后退
       onHistory (context, payload) {
-        return context.dispatch('onHistoryRemove', payload)
+        return context.dispatch('onHistoryRemove', payload.to.path)
           .then((forward) => {
             // 判断是否根目录
             if (context.state.record.length && (payload.to.path === '/' || payload.to.meta.level === 0)) {
@@ -57,11 +61,17 @@ export default (store, router) => {
                 el: ''
               }] })
             } else if (forward) {
-              if (payload.from.matched.length) {
+              // 如果执行的是replace则删除上一个页面
+              if (context.state.routerState === 'replace') {
+                context.state.record.pop()
+              // 记录上一个一个最后的样式
+              } else if (payload.from.matched.length) {
                 let record = context.state.record
+                // 拿到最后一个
                 record[record.length - 1].el = payload.from.matched[0].instances.default.$el
                 context.commit('SET_RECORD', { record: record })
               }
+              // 记录新页面
               context.dispatch('onHistoryPush', { record: {
                 path: payload.to.path,
                 scrollTop: 0,
@@ -86,11 +96,12 @@ export default (store, router) => {
         context.commit('SET_RECORD', { record: record })
       },
       // 删除浏览记录
-      onHistoryRemove (context, payload) {
+      onHistoryRemove (context, path) {
         let subscript = ''
         let record = context.state.record.concat()
+        // 因为可以跨页面返回
         for (var i in record) {
-          if (record[i].path === payload.to.path) {
+          if (record[i].path === path) {
             subscript = Number(i) + 1
             break
           }
@@ -107,6 +118,7 @@ export default (store, router) => {
   })
 
   let isPush = false
+  let firstOpen = true
   let endTime = Date.now()
   let methods = ['push', 'go', 'replace', 'forward', 'back']
 
@@ -115,13 +127,13 @@ export default (store, router) => {
   })
   methods.forEach(key => {
     let method = router[key].bind(router)
-    router[key] = function (...args) {
+    router[key] = (...args) => {
+      store.commit('SET_ROUTER_STATE', key)
       isPush = true
       method.apply(null, args)
     }
   })
-  let firstOpen = true
-  //
+
   router.beforeEach(function (to, from, next) {
     if (!firstOpen) {
       store.commit('SET_FIRST_OPEN', { firstOpen: false })
@@ -133,11 +145,13 @@ export default (store, router) => {
     } else {
       store.commit('SET_IOS_BACK', { iosBack: false })
     }
+    // 记录历史记录
     store.dispatch('onHistory', {
       to: to,
       from: from
     })
       .then((forward) => {
+        // 设置转场动画
         if (forward) {
           // 第一个页面取消动画
           if (firstOpen) {

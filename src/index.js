@@ -34,7 +34,7 @@ const install = function (Vue, opts = {}) {
   Vue.use(vhVueEventBus)
   // Vue.use(vhAjax)
   Vue.use(vhVueHook)
-  Vue.use(vhNative)
+  // Vue.use(vhNative)
   Vue.use(vhLog)
 
   if (opts.store) {

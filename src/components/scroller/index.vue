@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-09-11 10:49:39
+ * @Last Modified time: 2019-11-04 17:19:55
  * @Description: 滚动组件
  */
 <template>
@@ -10,7 +10,7 @@
     <!-- 下拉模块 -->
     <div class="scroller-top" ref="up">
       <slot name="up">
-        <p>{{config.up.text[config.up.state]}}</p>
+        <p>{{config.up.text[up.state]}}</p>
       </slot>
     </div>
     <!-- 下拉模块 end-->
@@ -25,7 +25,7 @@
       <div class="scroller-bottom">
         <!-- <img src="" alt="" /> -->
         <slot name="down">
-          <p>{{config.down.text[config.down.state]}}</p>
+          <p>{{config.down.text[down.state]}}</p>
         </slot>
       </div>
       <!-- 加载更多模块 end -->
@@ -59,27 +59,39 @@ export default {
           trigger: 50, // 触发位置
           text: ['下拉刷新', '释放刷新', '正在刷新', '刷新成功'],
           delay: 500, // 延时执行动画
-          duration: 300, // 动画时间
-          loading: false, // 加载中
-          state: 0 // 状态码对应text下标
+          duration: 300 // 动画时间
         },
         down: {
           deltaY: 60, // 悬停位置
           trigger: 50, // 触发位置
           text: ['上拉加载更多', '正在加载更多', '我是有底线的'],
-          loading: false, // 加载中
-          pause: false, // 暂停
-          state: 0 // 状态码对应text下标
+          pause: false // 暂停
         }
+      },
+      up: {
+        loading: false, // 加载中
+        state: 0 // 状态码对应text下标
+      },
+      down: {
+        loading: false, // 加载中
+        state: 0 // 状态码对应text下标
       },
       scrollTop: 0
     }
   },
   computed: {
     config () {
+      let up = {
+        ...this.default.up,
+        ...this.options.up
+      }
+      let down = {
+        ...this.default.down,
+        ...this.options.down
+      }
       return {
-        ...this.default,
-        ...this.options
+        up,
+        down
       }
     }
   },
@@ -170,17 +182,17 @@ export default {
         slideY = limit
       }
       if (slideY > this.config.up.trigger) {
-        this.config.up.state = 1
+        this.up.state = 1
       } else {
-        this.config.up.state = 0
+        this.up.state = 0
       }
       this.onMove(slideY)
       this.deltaY = slideY
     },
     // 上拉处理器
     panupHandler (e) {
-      if (this.config.down.pause) return
-      if (this.config.down.loading) return
+      if (this.down.pause) return
+      if (this.down.loading) return
       if (e.target.clientHeight + e.target.scrollTop >= e.target.scrollHeight - this.config.down.deltaY) {
         this.onLoading()
       }
@@ -193,8 +205,8 @@ export default {
     },
     // 重置
     onReset (delay = true) {
-      if (this.config.up.loading) {
-        this.config.up.state = 3
+      if (this.up.loading) {
+        this.up.state = 3
       }
       Velocity(this.el.main, {
         translateY: [0, `${this.deltaY}px`]
@@ -202,7 +214,7 @@ export default {
         duration: this.config.up.duration,
         delay: delay ? this.config.up.delay : 0,
         complete: () => {
-          this.config.up.loading = false
+          this.up.loading = false
           this.disable = false
           this.run = false
           this.el.main.style.transform = ''
@@ -219,28 +231,28 @@ export default {
     },
     // 触发刷新
     onRefresh () {
-      this.config.up.state = 2
-      this.config.up.loading = true
+      this.up.state = 2
+      this.up.loading = true
       this.$emit('on-refresh')
       // console.log('触发刷新')
     },
     // 触发加载更多
     onLoading () {
-      this.config.down.state = 1
-      this.config.down.loading = true
+      this.down.state = 1
+      this.down.loading = true
       this.$emit('on-loading')
       // console.log('触发加载更多')
     },
     // 暂停加载更多
     onPauseLoading () {
-      this.config.down.state = 2
-      this.config.down.pause = true
+      this.down.state = 2
+      this.down.pause = true
     },
     // 恢复加载更多
     onRecoveryLoading () {
-      this.config.down.pause = false
-      this.config.down.loading = false
-      this.config.down.state = 0
+      this.down.pause = false
+      this.down.loading = false
+      this.down.state = 0
     },
     // 记录滚动位置
     onScroll () {

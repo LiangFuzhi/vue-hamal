@@ -1,5 +1,4 @@
 import plusReady from '../../libs/plusReady.js'
-import Promise from 'bluebird'
 let wt = ''
 let upload = {
   /**
@@ -66,12 +65,13 @@ let upload = {
    * @param  {[array]}   pathArray   [本地文件地址数组]
    * @return {[obj]}          [Promise]
    */
-  batchUpload: function (server, pathArray) {
+  batchUpload: async function (server, pathArray) {
+    const Promise = (await import(/* webpackChunkName: "bluebird" */ 'bluebird')).default
     return Promise.reduce(pathArray, (total, fileName, index, length) => {
       if (fileName.src) {
         return this.upload(server, fileName.src, `${index + 1}/${length}`, index === 0, index + 1 === length)
           .then((contents) => {
-            total.push(Object.assign({}, pathArray[index], {'id': contents}))
+            total.push(Object.assign({}, pathArray[index], { 'id': contents }))
             return total
           })
       } else {

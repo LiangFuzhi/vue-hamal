@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:14:04
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-08-02 15:34:00
+ * @Last Modified time: 2019-11-06 16:19:08
  * @Description: 页面主题
  */
 <template>
@@ -64,15 +64,10 @@ export default {
       this.SET_LAZY(false)
     }
     this.path = this.$route.path
-    window.addEventListener('resize', () => {
-      if (this.history.activate === this.path) {
-        setTimeout(this.getHeadAndFeetHeight, 100)
-      }
-    }, false)
+    this.getHeadAndFeetHeight()
   },
   mounted () {
     this.$nextTick(() => {
-      this.getHeadAndFeetHeight()
       this.onScroll()
       if (!this.history.firstOpen) {
         setTimeout(() => {
@@ -110,10 +105,19 @@ export default {
         bottom: '0'
       },
       scrollTop: 0,
-      show: true
+      show: true,
+      intervalId: ''
     }
   },
-  activated () {},
+  activated () {
+    this.getHeadAndFeetHeight()
+  },
+  deactivated () {
+    this.destroyInterval()
+  },
+  beforeDestroy () {
+    this.destroyInterval()
+  },
   watch: {
     options (val) {
       this.config = {
@@ -155,13 +159,23 @@ export default {
       }
       // }
     },
+    // 删除定时器
+    destroyInterval () {
+      if (this.intervalId) {
+        clearInterval(this.intervalId)
+        this.intervalId = ''
+      }
+    },
     // 获取头和脚高度
     getHeadAndFeetHeight () {
       if (!this.fullScreen) {
         this.main = {
-          top: this.$refs.header.offsetHeight,
-          bottom: this.$refs.footer.offsetHeight
+          // getBoundingClientRect精确拿到高度，精确到小数
+          top: this.$refs.header ? this.$refs.header.getBoundingClientRect().height : 0,
+          bottom: this.$refs.footer ? this.$refs.footer.getBoundingClientRect().height : 0
         }
+        this.destroyInterval()
+        this.intervalId = setInterval(this.getHeadAndFeetHeight, 200)
       }
     },
     // 记录滚动位置
