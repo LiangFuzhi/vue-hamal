@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:49
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-06-21 13:43:45
+ * @Last Modified time: 2020-04-09 11:17:59
  * @Description: 页面动画
  */
 <template>
@@ -22,7 +22,7 @@
       @after-leave="afterLeave"
       :css="false">
         <keep-alive>
-          <router-view class="page"></router-view>
+          <router-view class="page active"></router-view>
         </keep-alive>
       </transition>
     </div>
@@ -34,7 +34,7 @@ import {
   mapState,
   mapMutations
 } from 'vuex'
-import Velocity from 'velocity-animate'
+import anime from 'animejs/lib/anime.es.js'
 import Hammer from 'hammerjs'
 export default {
   name: 'vh-page-animation',
@@ -109,6 +109,7 @@ export default {
           this.$refs.back.appendChild(backEl.el)
           if (backEl.scrollTop) {
             setTimeout(() => {
+              // 历史页面回到会原位置
               let scroller = this.$refs.back.getElementsByClassName('vh-scroller')
               for (const iterator of scroller) {
                 iterator.scrollTop = backEl.scrollTop
@@ -156,7 +157,7 @@ export default {
       }
       if (this.history.direction === 'forward') {
         if (!this.history.iosBack || this.history.animation) {
-          el.style.transform = 'translate3d(0, 100%, 0)'
+          el.style.transform = 'translateX(100%) translateZ(0px)'
         }
       }
       this.SET_IS_TRANSITION_AFTER(false)
@@ -170,13 +171,15 @@ export default {
       switch (this.history.direction) {
         case 'forward':
           // 控制右边页面
-          Velocity(el, {
-            translateX: ['0%', '100%']
-          }, {
+          anime({
+            targets: el,
+            translateX: ['100%', '0%'],
+            translateZ: 0,
             duration: this.duration,
-            complete: done
+            complete: done,
+            easing: 'easeInOutSine'
           })
-          this.onAnimateShadow(['0%', '100%'], ['1', '0'], this.duration)
+          this.onAnimateShadow(['100%', '0%'], ['0', '1'], this.duration)
           break
         case 'reverse':
           // 控制左边页面
@@ -185,11 +188,13 @@ export default {
           } else {
             el.style.zIndex = '-1'
             if (this.device.os.ios) {
-              Velocity(el, {
-                translateX: ['0%', '-20%']
-              }, {
+              anime({
+                targets: el,
+                translateX: ['-20%', '0%'],
+                translateZ: 0,
                 duration: this.duration,
-                complete: done
+                complete: done,
+                easing: 'easeInOutSine'
               })
             } else {
               setTimeout(() => {
@@ -229,13 +234,13 @@ export default {
           // 控制左边页面
           el.style.zIndex = '-1'
           if (this.device.os.ios) {
-            Velocity(el, {
-              translateX: ['-20%', '0%']
-            }, {
+            anime({
+              targets: el,
+              translateX: ['0', '-20%'],
+              translateZ: 0,
               duration: this.duration,
-              complete: () => {
-                done()
-              }
+              complete: done,
+              easing: 'easeInOutSine'
             })
           } else {
             setTimeout(() => {
@@ -248,15 +253,15 @@ export default {
           if (this.isPanBack) {
             done()
           } else {
-            Velocity(el, {
-              translateX: ['100%', '0%']
-            }, {
+            anime({
+              targets: el,
+              translateX: ['0%', '100%'],
+              translateZ: 0,
               duration: this.duration,
-              complete: () => {
-                done()
-              }
+              complete: done,
+              easing: 'easeInOutSine'
             })
-            this.onAnimateShadow(['100%', '0%'], ['0', '1'], this.duration)
+            this.onAnimateShadow(['0%', '100%'], ['1', '0'], this.duration)
           }
           break
         default:
@@ -289,9 +294,9 @@ export default {
           scale = 0
         }
         if (this.device.os.ios) {
-          this.$refs.back.style.transform = `translate3d(${scale * 100 * 0.2 - 20}%, 0, 0)`
+          this.$refs.back.style.transform = `translateX(${scale * 100 * 0.2 - 20}%) translateZ(0px)`
         }
-        this.enterTarget.el.style.transform = `translate3d(${scale * 100}%, 0, 0)`
+        this.enterTarget.el.style.transform = `translateX(${scale * 100}%) translateZ(0px)`
         this.onAnimateShadow(scale * 100, (1 - scale) * 1, 0)
       }
     },
@@ -322,9 +327,10 @@ export default {
         } else {
           duration = Math.abs(this.duration * scale)
         }
-        Velocity(this.enterTarget.el, {
-          translateX: [enterTranslateX, `${scale * 100}%`]
-        }, {
+        anime({
+          targets: this.enterTarget.el,
+          translateX: [`${scale * 100}%`, enterTranslateX],
+          translateZ: 0,
           duration: duration,
           complete: () => {
             if (back) {
@@ -337,14 +343,17 @@ export default {
               this.isBack = false
             }, 0)
             // this.SET_IS_DRAG_BACK(true)
-          }
+          },
+          easing: 'easeInOutSine'
         })
-        this.onAnimateShadow([enterTranslateX, `${scale * 100}%`], '0', duration)
+        this.onAnimateShadow([`${scale * 100}%`, enterTranslateX], [(1 - scale) * 1, back ? 0 : 1], duration)
         if (this.device.os.ios) {
-          Velocity(this.$refs.back, {
-            translateX: [backTranslateX, `${scale * 100 * 0.2 - 20}%`]
-          }, {
-            duration: duration
+          anime({
+            targets: this.$refs.back,
+            translateX: [`${scale * 100 * 0.2 - 20}%`, backTranslateX],
+            translateZ: 0,
+            duration: duration,
+            easing: 'easeInOutSine'
           })
         }
       }
@@ -352,17 +361,19 @@ export default {
     // 控制阴影移动
     onAnimateShadow (translateX, opacity, duration) {
       if (duration === 0) {
-        this.$refs.shadow.style.transform = `translate3d(${translateX}%, 0, 0)`
+        this.$refs.shadow.style.transform = `translateX(${translateX}%) translateZ(0px)`
         this.$refs.shadow.style.opacity = opacity
       } else {
-        Velocity(this.$refs.shadow, {
+        anime({
+          targets: this.$refs.shadow,
           translateX: translateX,
-          opacity
-        }, {
+          translateZ: 0,
           duration: duration,
           complete: () => {
             this.$refs.shadow.removeAttribute('style')
-          }
+          },
+          easing: 'easeInOutSine',
+          opacity
         })
       }
     },

@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-11-04 17:19:55
+ * @Last Modified time: 2020-04-09 11:16:29
  * @Description: 滚动组件
  */
 <template>
@@ -36,7 +36,7 @@
 
 <script>
 import Hammer from 'hammerjs'
-import Velocity from 'velocity-animate'
+import anime from 'animejs/lib/anime.es.js'
 import { mapMutations } from 'vuex'
 export default {
   name: 'vh-scroller',
@@ -199,7 +199,7 @@ export default {
     },
     // 移动main
     onMove (slideY) {
-      let style = `translate3d(0, ${slideY}px, 0)`
+      let style = `translateY(${slideY}px) translateZ(0px)`
       this.el.up.style.transform = style
       this.el.main.style.transform = style
     },
@@ -208,9 +208,10 @@ export default {
       if (this.up.loading) {
         this.up.state = 3
       }
-      Velocity(this.el.main, {
-        translateY: [0, `${this.deltaY}px`]
-      }, {
+      anime({
+        targets: this.el.main,
+        translateY: [`${this.deltaY}px`, '0px'],
+        translateZ: 0,
         duration: this.config.up.duration,
         delay: delay ? this.config.up.delay : 0,
         complete: () => {
@@ -218,13 +219,16 @@ export default {
           this.disable = false
           this.run = false
           this.el.main.style.transform = ''
-        }
+        },
+        easing: 'easeInOutSine'
       })
-      Velocity(this.el.up, {
-        translateY: [0, `${this.deltaY}px`]
-      }, {
+      anime({
+        targets: this.el.up,
+        translateY: [`${this.deltaY}px`, '0px'],
+        translateZ: 0,
         duration: this.config.up.duration,
-        delay: delay ? this.config.up.delay : 0
+        delay: delay ? this.config.up.delay : 0,
+        easing: 'easeInOutSine'
       })
       this.deltaY = 0
       if (delay) this.onRecoveryLoading()
