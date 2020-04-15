@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-04-09 11:16:29
+ * @Last Modified time: 2020-04-13 17:08:50
  * @Description: 滚动组件
  */
 <template>
@@ -36,7 +36,7 @@
 
 <script>
 import Hammer from 'hammerjs'
-import anime from 'animejs/lib/anime.es.js'
+import anime from 'animejs'
 import { mapMutations } from 'vuex'
 export default {
   name: 'vh-scroller',

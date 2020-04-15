@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:49
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-04-09 11:17:59
+ * @Last Modified time: 2020-04-13 17:08:42
  * @Description: 页面动画
  */
 <template>
@@ -34,7 +34,7 @@ import {
   mapState,
   mapMutations
 } from 'vuex'
-import anime from 'animejs/lib/anime.es.js'
+import anime from 'animejs'
 import Hammer from 'hammerjs'
 export default {
   name: 'vh-page-animation',
