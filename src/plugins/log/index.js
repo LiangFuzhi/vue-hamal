@@ -12,8 +12,10 @@ var log = {
       db.transaction((context) => {
         context.executeSql('CREATE TABLE IF NOT EXISTS log (error text, time text)')
       }, (err) => {
+        log.failHook && log.failHook('init', err)
         reject(err)
       }, () => {
+        log.completeHook && log.completeHook('init')
         resolve()
       })
     })
@@ -33,8 +35,10 @@ var log = {
           let data = [error, time]
           context.executeSql('INSERT INTO log (error, time) VALUES (?, ?)', data)
         }, (err) => {
+          log.failHook && log.failHook('write', err)
           reject(err)
         }, () => {
+          log.completeHook && log.completeHook('write', error)
           resolve()
         })
       }
@@ -67,14 +71,15 @@ var log = {
             }
             // alert(JSON.stringify(arr,null,2))
             // console.log(result);
-            resolve(arr.reverse())
+            let data = arr.reverse()
+            log.completeHook && log.completeHook('query', data)
+            resolve(data)
           })
         }, (err) => {
           console.log(err)
+          log.failHook && log.failHook('query', err)
           reject(err)
-        }, () => {
-
-        })
+        }, () => {})
       }
     })
   },
@@ -85,8 +90,10 @@ var log = {
           context.executeSql('DELETE FROM log')
           // context.executeSql('DROP TABLE log');
         }, (err) => {
+          log.failHook && log.failHook('empty', err)
           reject(err)
         }, () => {
+          log.completeHook && log.completeHook('empty')
           resolve()
         })
       }

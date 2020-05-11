@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:49
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-04-13 17:08:42
+ * @Last Modified time: 2020-05-11 11:19:28
  * @Description: 页面动画
  */
 <template>
@@ -22,7 +22,7 @@
       @after-leave="afterLeave"
       :css="false">
         <keep-alive>
-          <router-view class="page active"></router-view>
+          <router-view class="page active" ref="routerView"></router-view>
         </keep-alive>
       </transition>
     </div>
@@ -42,11 +42,15 @@ export default {
     // 在vuex创建page
     this.$store.registerModule('page', {
       state: {
+        isSlideBack: false, // 是否允许右滑手势返回
         isBack: false, // 是否允许返回
         isDragBack: false, // 是否支持拖拽返回
         isTransitionAfter: true // 动画完成后
       },
       mutations: {
+        SET_IS_SLIDE_BACK (state, payload) {
+          state.isSlideBack = payload
+        },
         SET_IS_DRAG_BACK (state, payload) {
           state.isDragBack = payload
         },
@@ -80,7 +84,8 @@ export default {
       enterTarget: '', // 进入页面目标
       translateX: '100%',
       backEl: '', // 历史页面对象
-      isBack: false, // 是否正在返回
+      isDragBack: false, // 是否正在拖拽返回
+      isSlideBack: false, // 是否正在右滑手势返回
       isPanBack: false, // 是否正在滑动返回
       disableDragBack: false // 禁用拖拉返回
     }
@@ -96,6 +101,7 @@ export default {
           el: record[record.length - 2].el.cloneNode(true),
           scrollTop: record[record.length - 2].scrollTop
         }
+        this.backEl.el.classList.remove('active')
       } else {
         this.backEl = ''
       }
@@ -274,18 +280,21 @@ export default {
     },
     // 滑动开始
     onPanstart (e) {
-      if (this.enterTarget && !this.isBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 45)) && this.backEl) {
+      if (this.enterTarget && !this.isDragBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 45)) && this.backEl) {
         // this.enterTarget.el.style.touchAction = 'none'
         e.preventDefault()
         // e.cancelBubble = true
         // e.stopPropagation()
-        this.isBack = true
+        this.isDragBack = true
         this.onPanmove(e)
+      } else if (this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45) {
+        e.preventDefault()
+        this.isSlideBack = true
       }
     },
     // 滑动中
     onPanmove (e) {
-      if (this.isBack) {
+      if (this.isDragBack) {
         e.preventDefault()
         // e.cancelBubble = true
         // e.stopPropagation()
@@ -298,11 +307,13 @@ export default {
         }
         this.enterTarget.el.style.transform = `translateX(${scale * 100}%) translateZ(0px)`
         this.onAnimateShadow(scale * 100, (1 - scale) * 1, 0)
+      } else if (this.isSlideBack) {
+        e.preventDefault()
       }
     },
     // 滑动结束
     onPanend (e) {
-      if (this.isBack) {
+      if (this.isDragBack) {
         e.preventDefault()
         // e.cancelBubble = true
         // e.stopPropagation()
@@ -338,9 +349,12 @@ export default {
               // if (this.history.record.length > 1) {
               //   this.$router.push(this.history.record[this.history.record.length - 2])
               // }
+              setTimeout(() => {
+                this.$refs.routerView.$el.removeAttribute('style')
+              }, 0)
             }
             setTimeout(() => {
-              this.isBack = false
+              this.isDragBack = false
             }, 0)
             // this.SET_IS_DRAG_BACK(true)
           },
@@ -356,6 +370,10 @@ export default {
             easing: 'easeInOutSine'
           })
         }
+      } else if (this.isSlideBack && this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45 && e.deltaTime < 200) {
+        e.preventDefault()
+        this.isSlideBack = false
+        this.$router.back()
       }
     },
     // 控制阴影移动
@@ -387,7 +405,7 @@ export default {
     back () {
       this.plusReady(() => {
         window.plus.key.addEventListener('backbutton', () => {
-          if (this.isBack) return
+          if (this.isDragBack) return
           if (!this.page.isBack) {
             // 把应用切换到后台运行
             this.$native.moveTaskToBack()

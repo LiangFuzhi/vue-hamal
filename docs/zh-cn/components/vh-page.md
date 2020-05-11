@@ -67,7 +67,8 @@ https://github.com/LiangFuzhi/vue-hamal/blob/master/src/demo/components/Hello-1-
 | 参数       | 类型            | 必须?      | 默认值        | 说明                                                          |
 | --------- | --------------- | --------- | ------------ | ------------------------------------------------------------ |
 | options   | Object          | No        | 往下看 | 配置页面信息     |
-| options.back   | Boolean          | No        | true | 右滑拖动返回     |
+| options.dragBack   | Boolean          | No        | true | 右滑拖动返回     |
+| options.slideBack   | Boolean          | No        | true | 右滑手势返回     |
 | options.backgroundColor   | String          | No        | #fff | 页面背景色     |
 | options.lazy   | Boolean          | No        | true | 页面懒加载     |
 | options.header   | Object          | No        | {} | 配置页面信息     |

@@ -15,7 +15,8 @@ export default {
     return {
       msg: 'Hello Vue 3!',
       options: {
-        back: true,
+        dragBack: false,
+        slideBack: true,
         backgroundColor: '#eee',
         header: {
           title: '页面-3',

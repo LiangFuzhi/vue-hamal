@@ -19,7 +19,7 @@ export default {
     return {
       msg: 'Hello Vue 2!',
       options: {
-        back: true,
+        dragBack: true,
         backgroundColor: '#eee',
         header: {
           title: '页面-2',

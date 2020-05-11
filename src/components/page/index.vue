@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:14:04
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-11-06 16:19:08
+ * @Last Modified time: 2020-05-11 09:52:57
  * @Description: 页面主题
  */
 <template>
@@ -95,10 +95,11 @@ export default {
     return {
       path: '',
       config: {
-        back: true,
-        backgroundColor: '#fff',
-        lazy: true,
-        header: {}
+        slideBack: true, // 是否允许右滑手势返回
+        dragBack: true, // 是否允许右滑拖拽返回
+        backgroundColor: '#fff', // 背景色
+        lazy: true, // 懒加载
+        header: {} // 导航栏配置
       },
       main: {
         top: '44',
@@ -148,14 +149,20 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['SET_IS_DRAG_BACK', 'SET_SCROLL_TOP', 'SET_LAZY']),
+    ...mapMutations(['SET_IS_DRAG_BACK', 'SET_IS_SLIDE_BACK', 'SET_SCROLL_TOP', 'SET_LAZY']),
     // 设置是否允许返回
     setBack () {
       // if ((this.history.activate === this.path)) {
-      if (this.config.back) {
+      if (this.config.dragBack) {
         this.SET_IS_DRAG_BACK(true)
       } else {
         this.SET_IS_DRAG_BACK(false)
+      }
+
+      if (this.config.slideBack) {
+        this.SET_IS_SLIDE_BACK(true)
+      } else {
+        this.SET_IS_SLIDE_BACK(false)
       }
       // }
     },

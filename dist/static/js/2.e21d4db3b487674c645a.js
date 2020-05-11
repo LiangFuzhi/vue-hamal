@@ -1,2 +1,0 @@
-webpackJsonp([2],{aMMw:function(e,t){},fKsR:function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var a={render:function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("div",[n("vh-page",{attrs:{options:{title:"页面-3",back:!0}}},e._l(15,function(t){return n("h1",{key:t},[e._v(e._s(e.msg))])}))],1)},staticRenderFns:[]};var r=n("VU/8")({name:"demo-3",data:function(){return{msg:"Hello Vue 3!"}},components:{}},a,!1,function(e){n("aMMw")},"data-v-071ca41f",null);t.default=r.exports}});
-//# sourceMappingURL=2.e21d4db3b487674c645a.js.map

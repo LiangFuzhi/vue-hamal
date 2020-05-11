@@ -27,7 +27,7 @@ export default {
       // sum: 15,
       msg: 'Hello Vue 1-1!',
       options: {
-        back: false,
+        dragBack: false,
         backgroundColor: '#eee',
         header: {
           title: '页面-1-1',

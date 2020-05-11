@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-04-13 17:08:50
+ * @Last Modified time: 2020-04-16 18:47:04
  * @Description: 滚动组件
  */
 <template>
@@ -36,7 +36,7 @@
 
 <script>
 import Hammer from 'hammerjs'
-import anime from 'animejs'
+import anime from 'animejs/lib/anime.es.js'
 import { mapMutations } from 'vuex'
 export default {
   name: 'vh-scroller',
@@ -50,7 +50,6 @@ export default {
       }, // 目标dom
       deltaY: 0, // 位置
       offsetY: 0, // 偏移量
-      disable: false, // 禁用
       run: false, // 运行
       damp: 0.6, // 阻尼
       default: {
@@ -138,20 +137,23 @@ export default {
     },
     // 滑动开始
     onPanStart (event) {
-      if (this.disable) return
-      if (this.run) return
+      if (this.run) {
+        event.preventDefault()
+        return
+      }
       if ((event.direction !== 16) || (Math.abs(event.angle) < 45) || (this.scrollTop !== 0)) {
-        this.disable = true
         return
       }
       event.preventDefault()
-      this.run = true
       this.onPanMove(event)
     },
     // 滑动中
     onPanMove (event) {
-      if (this.disable) return
-      if (event.deltaY > 0) {
+      if (this.run) {
+        event.preventDefault()
+        return
+      }
+      if (event.deltaY > 0 || event.deltaY === 0) {
         if (this.scrollTop !== 0) {
           this.offsetY = event.deltaY
         } else {
@@ -162,10 +164,11 @@ export default {
     },
     // 滑动结束
     onPanEnd (event) {
-      if (this.disable) {
-        this.disable = false
+      if (this.run) {
+        event.preventDefault()
         return
       }
+      this.run = true
       this.offsetY = 0
       if (this.deltaY > this.config.up.trigger) {
         this.onRefresh()
@@ -216,9 +219,9 @@ export default {
         delay: delay ? this.config.up.delay : 0,
         complete: () => {
           this.up.loading = false
-          this.disable = false
           this.run = false
-          this.el.main.style.transform = ''
+          // 清空transform在ios端会无端端白屏不渲染
+          // this.el.main.style.transform = ''
         },
         easing: 'easeInOutSine'
       })
