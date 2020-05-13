@@ -2,11 +2,11 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:49
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-05-11 11:19:28
+ * @Last Modified time: 2020-05-13 14:49:39
  * @Description: 页面动画
  */
 <template>
-  <div ref="bubble">
+  <!-- <div ref="bubble"> -->
     <div ref="page" class="page-touch">
       <!-- 实现右滑返回的历史页面 -->
       <div class="page back" ref="back"></div>
@@ -26,7 +26,7 @@
         </keep-alive>
       </transition>
     </div>
-  </div>
+  <!-- </div> -->
 </template>
 
 <script>
@@ -45,7 +45,8 @@ export default {
         isSlideBack: false, // 是否允许右滑手势返回
         isBack: false, // 是否允许返回
         isDragBack: false, // 是否支持拖拽返回
-        isTransitionAfter: true // 动画完成后
+        isTransitionAfter: true, // 动画完成后
+        isDrag: false // 是否正在拖拽
       },
       mutations: {
         SET_IS_SLIDE_BACK (state, payload) {
@@ -59,6 +60,9 @@ export default {
         },
         SET_IS_TRANSITION_AFTER (state, payload) {
           state.isTransitionAfter = payload
+        },
+        SET_IS_DRAG (state, payload) {
+          state.isDrag = payload
         }
       }
     })
@@ -124,10 +128,13 @@ export default {
           }
         }
       }, this.duration)
+    },
+    isDragBack (val) {
+      this.SET_IS_DRAG(val)
     }
   },
   methods: {
-    ...mapMutations(['SET_IS_DRAG_BACK', 'SET_IS_TRANSITION_AFTER']),
+    ...mapMutations(['SET_IS_DRAG_BACK', 'SET_IS_TRANSITION_AFTER', 'SET_IS_DRAG']),
     handler () {
       var hammer = new Hammer(this.$refs.page, {
         touchAction: 'auto',
@@ -139,21 +146,33 @@ export default {
           }]
         ]
       })
-      hammer.on('panstart', this.onPanstart, { passive: false })
-      hammer.on('panmove', this.onPanmove, { passive: false })
-      hammer.on('panend', this.onPanend, { passive: false })
-      // this.$refs.bubble.addEventListener('touchstart', (e) => {
-      //   // e.preventDefault()
-      //   e.stopPropagation()
-      // }, false)
-      // this.$refs.bubble.addEventListener('touchmove', (e) => {
-      //   // e.preventDefault()
-      //   e.stopPropagation()
-      // }, false)
-      // this.$refs.bubble.addEventListener('touchend', (e) => {
-      //   // e.preventDefault()
-      //   e.stopPropagation()
-      // }, false)
+      hammer.on('panstart', this.onPanstart)
+      hammer.on('panmove', this.onPanmove)
+      hammer.on('panend', this.onPanend)
+      // this.$refs.page.addEventListener('touchstart', (e) => {
+      //   if (this.isDragBack) {
+      //     e.preventDefault()
+      //     e.stopPropagation()
+      //   }
+      // }, true)
+      // this.$refs.page.addEventListener('touchmove', (e) => {
+      //   if (this.isDragBack) {
+      //     e.preventDefault()
+      //     e.stopPropagation()
+      //   }
+      // }, true)
+      // this.$refs.page.addEventListener('touchend', (e) => {
+      //   if (this.isDragBack) {
+      //     e.preventDefault()
+      //     e.stopPropagation()
+      //   }
+      // }, true)
+    },
+    // 阻止冒泡
+    preventDefault (event) {
+      event.stopImmediatePropagation() // 阻止调用相同事件的其他监听器
+      event.stopPropagation() // 阻止当前冒泡或捕获阶段的进一步传播
+      event.preventDefault() // 阻止默认事件
     },
     // 开始进来
     beforeEnter (el) {
@@ -282,20 +301,20 @@ export default {
     onPanstart (e) {
       if (this.enterTarget && !this.isDragBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 45)) && this.backEl) {
         // this.enterTarget.el.style.touchAction = 'none'
-        e.preventDefault()
+        this.preventDefault(e.srcEvent)
         // e.cancelBubble = true
         // e.stopPropagation()
         this.isDragBack = true
         this.onPanmove(e)
-      } else if (this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45) {
-        e.preventDefault()
+      } else if (this.enterTarget && this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45) {
+        this.preventDefault(e.srcEvent)
         this.isSlideBack = true
       }
     },
     // 滑动中
     onPanmove (e) {
       if (this.isDragBack) {
-        e.preventDefault()
+        this.preventDefault(e.srcEvent)
         // e.cancelBubble = true
         // e.stopPropagation()
         let scale = e.deltaX / document.body.clientWidth
@@ -308,13 +327,13 @@ export default {
         this.enterTarget.el.style.transform = `translateX(${scale * 100}%) translateZ(0px)`
         this.onAnimateShadow(scale * 100, (1 - scale) * 1, 0)
       } else if (this.isSlideBack) {
-        e.preventDefault()
+        this.preventDefault(e.srcEvent)
       }
     },
     // 滑动结束
     onPanend (e) {
       if (this.isDragBack) {
-        e.preventDefault()
+        this.preventDefault(e.srcEvent)
         // e.cancelBubble = true
         // e.stopPropagation()
         let scale = e.deltaX / document.body.clientWidth
@@ -370,8 +389,8 @@ export default {
             easing: 'easeInOutSine'
           })
         }
-      } else if (this.isSlideBack && this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45 && e.deltaTime < 200) {
-        e.preventDefault()
+      } else if (this.isSlideBack && this.enterTarget && this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45 && e.deltaTime < 200) {
+        this.preventDefault(e.srcEvent)
         this.isSlideBack = false
         this.$router.back()
       }

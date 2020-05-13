@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-04-16 18:47:04
+ * @Last Modified time: 2020-05-13 15:49:12
  * @Description: 滚动组件
  */
 <template>
@@ -37,7 +37,7 @@
 <script>
 import Hammer from 'hammerjs'
 import anime from 'animejs/lib/anime.es.js'
-import { mapMutations } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 export default {
   name: 'vh-scroller',
   mixins: [],
@@ -50,7 +50,7 @@ export default {
       }, // 目标dom
       deltaY: 0, // 位置
       offsetY: 0, // 偏移量
-      run: false, // 运行
+      isAnimeRun: false, // 运行动画
       damp: 0.6, // 阻尼
       default: {
         up: {
@@ -75,10 +75,12 @@ export default {
         loading: false, // 加载中
         state: 0 // 状态码对应text下标
       },
-      scrollTop: 0
+      scrollTop: 0, // 滚动位置
+      isDrag: false // 正在拖拽
     }
   },
   computed: {
+    ...mapState(['page']),
     config () {
       let up = {
         ...this.default.up,
@@ -131,44 +133,50 @@ export default {
           }]
         ]
       })
-      hammer.on('panstart', this.onPanStart, { passive: false })
-      hammer.on('panmove', this.onPanMove, { passive: false })
-      hammer.on('panend', this.onPanEnd, { passive: false })
+      hammer.on('panstart', this.onPanStart)
+      hammer.on('panmove', this.onPanMove)
+      hammer.on('panend', this.onPanEnd)
+    },
+    // 阻止冒泡
+    preventDefault (event) {
+      event.stopImmediatePropagation() // 阻止调用相同事件的其他监听器
+      event.stopPropagation() // 阻止当前冒泡或捕获阶段的进一步传播
+      event.preventDefault() // 阻止默认事件
     },
     // 滑动开始
     onPanStart (event) {
-      if (this.run) {
-        event.preventDefault()
+      if (this.isAnimeRun || this.page.isDrag) {
         return
       }
       if ((event.direction !== 16) || (Math.abs(event.angle) < 45) || (this.scrollTop !== 0)) {
         return
       }
-      event.preventDefault()
+      this.isDrag = true
+      this.preventDefault(event.srcEvent)
       this.onPanMove(event)
     },
     // 滑动中
     onPanMove (event) {
-      if (this.run) {
-        event.preventDefault()
+      if (this.isAnimeRun || !this.isDrag || this.page.isDrag) {
         return
       }
       if (event.deltaY > 0 || event.deltaY === 0) {
         if (this.scrollTop !== 0) {
           this.offsetY = event.deltaY
         } else {
-          event.preventDefault()
+          this.preventDefault(event.srcEvent)
           this.pandownHandler(event)
         }
       }
     },
     // 滑动结束
     onPanEnd (event) {
-      if (this.run) {
-        event.preventDefault()
+      if (this.isAnimeRun || !this.isDrag || this.page.isDrag) {
         return
       }
-      this.run = true
+      this.preventDefault(event.srcEvent)
+      this.isDrag = false
+      this.isAnimeRun = true
       this.offsetY = 0
       if (this.deltaY > this.config.up.trigger) {
         this.onRefresh()
@@ -219,7 +227,7 @@ export default {
         delay: delay ? this.config.up.delay : 0,
         complete: () => {
           this.up.loading = false
-          this.run = false
+          this.isAnimeRun = false
           // 清空transform在ios端会无端端白屏不渲染
           // this.el.main.style.transform = ''
         },

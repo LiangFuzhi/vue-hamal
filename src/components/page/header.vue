@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:14:52
  * @Last Modified by: LFZ
- * @Last Modified time: 2019-04-17 18:14:52
+ * @Last Modified time: 2020-05-13 11:38:52
  * @Description: 页面头部
  */
 <template>
@@ -91,6 +91,7 @@ export default {
         ...this.config,
         ...val
       }
+      this.setBack()
     }
   },
   methods: {

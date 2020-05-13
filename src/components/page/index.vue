@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:14:04
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-05-11 09:52:57
+ * @Last Modified time: 2020-05-13 11:37:57
  * @Description: 页面主题
  */
 <template>
@@ -125,6 +125,7 @@ export default {
         ...this.config,
         ...val
       }
+      this.setBack()
     }
   },
   computed: {
