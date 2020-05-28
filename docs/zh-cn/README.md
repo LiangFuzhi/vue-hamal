@@ -31,6 +31,9 @@
 ## 在线文档
 [https://liangfuzhi.github.io/vue-hamal/docs](https://liangfuzhi.github.io/vue-hamal/docs)
 
+## 手摸手，带你用vue快速撸前端页面切换效果
+[https://juejin.im/post/5ecf50b06fb9a047ba31f85c](https://juejin.im/post/5ecf50b06fb9a047ba31f85c)
+
 ## 如何使用
 npm
 ```
