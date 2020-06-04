@@ -1,6 +1,6 @@
 {
   "name": "vue-hamal",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "A Vue.js project",
   "author": "",
   "private": false,
@@ -17,6 +17,7 @@
     "bluebird": "^3.7.2",
     "exif-js": "^2.3.0",
     "hammerjs": "^2.0.8",
+    "localforage": "^1.7.3",
     "nprogress": "^0.2.0",
     "vue": "^2.6.11",
     "vue-meta": "^2.3.3",

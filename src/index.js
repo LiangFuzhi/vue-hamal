@@ -79,7 +79,7 @@ const install = function (Vue, opts = {}) {
 
   window.addEventListener('unhandledrejection', function (event) {
     Vue.$log.write({
-      'stack': event.reason.stack,
+      'error': event.reason.stack || event.reason.message,
       'type': 'unhandledrejection'
     })
   })

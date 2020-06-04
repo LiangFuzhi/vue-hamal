@@ -15,7 +15,8 @@ const routes = [
     ]
   },
   {path: '/Hello-2', component: () => import('@/demo/components/Hello-2.vue'), meta: {level: 2}},
-  {path: '/Hello-3', component: () => import('@/demo/components/Hello-3.vue'), meta: {level: 3}}
+  {path: '/Hello-3', component: () => import('@/demo/components/Hello-3.vue'), meta: {level: 3}},
+  {path: '/log', component: () => import('@/demo/components/log.vue'), meta: {level: 4}}
 ]
 
 export default new VueRouter({
