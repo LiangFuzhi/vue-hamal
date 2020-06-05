@@ -87,6 +87,8 @@ export default (store, router) => {
               }
             }
             return Promise.resolve(forward)
+          }).catch((error) => {
+            console.log(error)
           })
       },
       // 添加一个浏览记录
@@ -165,6 +167,8 @@ export default (store, router) => {
           store.commit('SET_DIRECTION', { direction: 'reverse' })
         }
         next()
+      }).catch((error) => {
+        console.log(error)
       })
   })
 

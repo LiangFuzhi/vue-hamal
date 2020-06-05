@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:49
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-05-13 14:49:39
+ * @Last Modified time: 2020-06-05 10:35:49
  * @Description: 页面动画
  */
 <template>
@@ -99,7 +99,7 @@ export default {
   },
   watch: {
     'history.record' (record) {
-      if (record.length > 1) {
+      if (record.length > 1 && record[record.length - 2].el) {
         // this.backEl = record[record.length - 2].el.firstChild.cloneNode(true)
         this.backEl = {
           el: record[record.length - 2].el.cloneNode(true),
