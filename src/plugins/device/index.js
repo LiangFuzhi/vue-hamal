@@ -1,4 +1,3 @@
-import plusReady from '../../libs/plusReady.js'
 import immersion from './immersion.js'
 import os from '../../libs/os.js'
 export default (store) => {
@@ -29,12 +28,7 @@ export default (store) => {
     height: immersion()
     // height:30
   }
-  plusReady(() => {
-    window.plus.runtime.getProperty(window.plus.runtime.appid, (info) => {
-      store.commit('updateVersion', {'version': info.version})
-    })
-  })
 
-  store.commit('updateNavigation', {'navigation': navigation})
-  store.commit('updateOs', {'os': os})
+  store.commit('updateNavigation', { 'navigation': navigation })
+  store.commit('updateOs', { 'os': os })
 }

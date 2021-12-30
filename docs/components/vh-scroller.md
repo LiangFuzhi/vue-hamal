@@ -1,6 +1,6 @@
 ## vh-scroller
 **基本用法**
-``` html
+``` vue
 <template>
   <vh-scroller ref="vhScroller" @on-loading="onLoading" @on-refresh="onRefresh">
     <slot :sum="sum"></slot>

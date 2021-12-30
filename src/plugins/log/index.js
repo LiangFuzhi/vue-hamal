@@ -18,7 +18,7 @@ var log = {
   },
   query: function () {
     let list = []
-    return localforage.iterate((value, key, iterationNumber) => {
+    return localforage.iterate((value, key) => {
       // 此回调函数将对所有 key/value 键值对运行
       list.unshift({
         time: key,
@@ -45,7 +45,7 @@ var log = {
 
 export default {
   install (Vue) {
-    Vue.prototype.$log = log
+    Vue.config.globalProperties.$log = log
     Vue.$log = log
   },
   log: log

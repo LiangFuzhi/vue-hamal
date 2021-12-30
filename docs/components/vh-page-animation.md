@@ -5,7 +5,7 @@ vh-page-animation已经内置<router-view></router-view>
 ```
 **基本用法**
 **app.vue**
-```
+``` vue
 <template>
   <vh-page-animation></vh-page-animation>
 </template>

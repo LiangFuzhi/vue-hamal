@@ -1,6 +1,6 @@
 ## vh-header
 **基本用法**
-``` html
+``` vue
 <template>
   <vh-header :options="config">标题</vh-header>
 </template>

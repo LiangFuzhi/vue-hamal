@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:06
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-05-13 15:49:12
+ * @Last Modified time: 2021-12-30 16:38:26
  * @Description: 滚动组件
  */
 <template>
@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import Hammer from 'hammerjs'
 import anime from 'animejs/lib/anime.es.js'
 import { mapState, mapMutations } from 'vuex'
 export default {
@@ -61,7 +60,6 @@ export default {
           duration: 300 // 动画时间
         },
         down: {
-          deltaY: 60, // 悬停位置
           trigger: 50, // 触发位置
           text: ['上拉加载更多', '正在加载更多', '我是有底线的'],
           pause: false // 暂停
@@ -104,8 +102,9 @@ export default {
       }
     }
   },
+  emits: ['on-refresh', 'on-loading'],
   watch: {},
-  created () {},
+  created () { },
   mounted () {
     this.$nextTick(() => {
       this.onScroll()
@@ -115,7 +114,7 @@ export default {
   back () {
     this.onRecoveryScroll()
   },
-  updated () {},
+  updated () { },
   filters: {},
   methods: {
     ...mapMutations(['SET_SCROLL_TOP']),
@@ -123,19 +122,12 @@ export default {
     hammerHandler () {
       this.el.main = this.$refs.content
       this.el.up = this.$refs.up
-      var hammer = new Hammer(this.$refs.content, {
-        touchAction: 'auto',
-        inputClass: Hammer.TouchInput,
-        recognizers: [
-          [Hammer.Pan, {
-            threshold: 0,
-            pointers: 0
-          }]
-        ]
+      this.$touch({
+        el: this.$refs.content,
+        panstart: this.onPanStart,
+        panmove: this.onPanMove,
+        panend: this.onPanEnd
       })
-      hammer.on('panstart', this.onPanStart)
-      hammer.on('panmove', this.onPanMove)
-      hammer.on('panend', this.onPanEnd)
     },
     // 阻止冒泡
     preventDefault (event) {
@@ -152,7 +144,7 @@ export default {
         return
       }
       this.isDrag = true
-      this.preventDefault(event.srcEvent)
+      this.preventDefault(event)
       this.onPanMove(event)
     },
     // 滑动中
@@ -164,7 +156,7 @@ export default {
         if (this.scrollTop !== 0) {
           this.offsetY = event.deltaY
         } else {
-          this.preventDefault(event.srcEvent)
+          this.preventDefault(event)
           this.pandownHandler(event)
         }
       }
@@ -174,7 +166,7 @@ export default {
       if (this.isAnimeRun || !this.isDrag || this.page.isDrag) {
         return
       }
-      this.preventDefault(event.srcEvent)
+      this.preventDefault(event)
       this.isDrag = false
       this.isAnimeRun = true
       this.offsetY = 0
@@ -204,7 +196,7 @@ export default {
     panupHandler (e) {
       if (this.down.pause) return
       if (this.down.loading) return
-      if (e.target.clientHeight + e.target.scrollTop >= e.target.scrollHeight - this.config.down.deltaY) {
+      if (e.target.clientHeight + e.target.scrollTop >= e.target.scrollHeight - this.config.down.trigger) {
         this.onLoading()
       }
     },
@@ -296,47 +288,47 @@ export default {
 </script>
 
 <style lang='less' scoped>
-  .vh-content {
-    // margin-top: -60px;
-    box-sizing: border-box;
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    width: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    -webkit-user-drag: none;
-  }
-  .loading {
-    text-align: center;
-    margin-top: 30%;
-    color: #666
-  }
-  .scroller-top {
-    position: absolute;
-    top: -60px;
-    width: 100%;
-    text-align: center;
-    height: 60px;
-    color: #666;
-    display: flex;
-    justify-content: center;
-    align-items:center;
-  }
-  .scroller-main {
-    text-align: center;
-    height: 50px;
-    color: #666;
-    display: flex;
-    justify-content: center;
-    align-items:center;
-  }
-  .scroller-bottom {
-    text-align: center;
-    height: 50px;
-    color: #666;
-    display: flex;
-    justify-content: center;
-    align-items:center;
-  }
+.vh-content {
+  // margin-top: -60px;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  -webkit-user-drag: none;
+}
+.loading {
+  text-align: center;
+  margin-top: 30%;
+  color: #666;
+}
+.scroller-top {
+  position: absolute;
+  top: -60px;
+  width: 100%;
+  text-align: center;
+  height: 60px;
+  color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.scroller-main {
+  text-align: center;
+  height: 50px;
+  color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.scroller-bottom {
+  text-align: center;
+  height: 50px;
+  color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

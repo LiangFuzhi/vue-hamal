@@ -2,10 +2,13 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:14:52
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-05-13 11:38:52
+ * @Last Modified time: 2021-11-12 15:10:18
  * @Description: 页面头部
  */
 <template>
+  <metainfo>
+    <template v-slot:title>{{config.title}}</template>
+  </metainfo>
   <div class="hamal-header" :style="hamalHeaderStyle" v-if="config.show">
     <div class="hamal-header-left" @click="onBack">
       <slot name="left">
@@ -64,8 +67,7 @@ export default {
   },
   metaInfo () {
     return {
-      title: this.config.title,
-      titleTemplate: null
+      title: ''
     }
   },
   computed: {

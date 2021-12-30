@@ -1,9 +1,8 @@
 <template>
   <div>
     <vh-page :options="options">
-      <!-- <router-link slot="main" to="/Hello-2" tag="a"> -->
-        <h1 v-for="i in 150" :key='i'>{{ msg }}</h1>
-      <!-- </router-link> -->
+      <h1>dragBack: false</h1>
+      <h1 v-for="i in 150" :key='i'>{{ msg }}</h1>
     </vh-page>
   </div>
 </template>

@@ -2,9 +2,9 @@
   <div>
     <vh-page :options="options">
       <vh-tabel>
-        <router-link to="/Hello-2" tag="a" slot-scope="{sum}">
-          <h1 v-for="i in sum" :key='i'>{{ msg }}</h1>
-        </router-link>
+        <template v-slot:default="{sum}">
+          <h1 v-for="i in sum" :key='i' @click="$router.push('/Hello-2')">{{ msg }}</h1>
+        </template>
       </vh-tabel>
     </vh-page>
   </div>

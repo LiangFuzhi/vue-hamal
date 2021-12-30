@@ -2,7 +2,7 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:14:04
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-05-13 11:37:57
+ * @Last Modified time: 2021-11-11 15:50:40
  * @Description: 页面主题
  */
 <template>
@@ -14,7 +14,9 @@
         <slot name="header-top"></slot>
         <vh-header :options="config.header">
           <slot name="header-title"></slot>
-          <slot name="header-right" slot="header-right"></slot>
+          <template v-slot:header-right>
+            <slot name="header-right"></slot>
+          </template>
         </vh-header>
         <slot name="header-bottom"></slot>
       </slot>
@@ -116,7 +118,7 @@ export default {
   deactivated () {
     this.destroyInterval()
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.destroyInterval()
   },
   watch: {
@@ -208,7 +210,7 @@ export default {
 }
 </script>
 <style>
-@import 'nprogress/nprogress.css';
+@import '~nprogress/nprogress.css';
 </style>
 <style scoped>
   .vh-frame {

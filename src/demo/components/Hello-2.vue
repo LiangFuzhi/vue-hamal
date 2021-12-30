@@ -1,11 +1,12 @@
 <template>
   <div>
     <vh-page :options="options">
-      <div slot="header-right" @click="click">提交</div>
+      <template v-slot:header-right>
+        <div @click="click">提交</div>
+      </template>
       <vhTabel>
-        <router-link to="/Hello-3" tag="a">
-          <h1 v-for="i in 150" :key='i'>{{ msg }}</h1>
-        </router-link>
+        <h1>dragBack: true</h1>
+        <h1 v-for="i in 150" :key='i' @click="$router.push('/Hello-3')">{{ msg }}</h1>
       </vhTabel>
     </vh-page>
   </div>

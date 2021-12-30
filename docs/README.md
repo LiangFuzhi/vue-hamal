@@ -1,6 +1,6 @@
 # vue-hamal
 
-> 基于vue + router + Vuex写的webapp快速构建工具，可以单独运行在web端。实现了页面切换管理
+> 基于vue3 + router + Vuex快速实现原生app的页面切换效果。
 
 <a href="https://github.com/LiangFuzhi/vue-hamal/issues">
   <img src="https://img.shields.io/github/issues/LiangFuzhi/vue-hamal.svg?style=flat-square" alt="">
@@ -68,65 +68,32 @@ module.exports = {
 ## main.js
 
 ``` javascript
-import Vue from 'vue'
-import router from '@/demo/router/index.js'
-import vueHamal from 'vue-hamal'
+// with polyfills
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+// import 'babel-polyfill' // 配置es6补丁
+import { createApp } from 'vue'
+
 import App from './App'
-import FastClick from 'fastclick'
-import Vuex from 'vuex'
+import * as consoleLog from '@/demo/assets/js/log.js'
+import vueHamal from 'vue-hamal'
+import router from '@/demo/router/index.js'
+import store from '@/demo/store/index.js'
 
-Vue.config.productionTip = false
-// 记录错误
-Vue.config.errorHandler = (err, vm, info) => {
-  console.error('errorHandler:', err)
-  Vue.$log.write({
-    'error': err.message,
-    'hook': info
-  })
-}
-// 记录错误
-window.Promise.prototype.catch = function (onRejected) {
-  return this.then(null, (err) => {
-    console.error('prototype:', err.message)
-    if (err.message) {
-      Vue.$log.write({
-        'error': err.message,
-        'remarks': 'Promise error'
-      })
-    }
-    onRejected(err)
-  })
-}
-// 删除点击延时
-FastClick.attach(document.body)
-Vue.use(Vuex)
-let store = new Vuex.Store({
-  strict: false
+const app = createApp(App)
+
+app.use(store)
+app.use(router)
+
+consoleLog.buddha()
+
+app.use(vueHamal, {
+  store,
+  router
 })
 
-Vue.use(vueHamal, {
-  store: store,
-  router: router
-})
-// 初始化日记功能
-Vue.$log.init()
-window.onerror = function (msg, url, line) {
-  console.error('onerror:', msg)
-  Vue.$log.write({
-    'url': url,
-    'error': msg,
-    'line': line
-  })
-}
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  // render: h => h(App),
-  template: '<App/>',
-  components: { App },
-  router,
-  store
-})
+app.mount("#app")
+
 ```
 
 ## app.vue
@@ -160,25 +127,29 @@ export default {
 ## router.js
 
 ``` javascript
-// 配置页面
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import {vhPageAnimation} from 'vue-hamal'
-Vue.use(VueRouter)
-// 配置页面
-const routes = [{
-  path: '',
-  component: vhPageAnimation,
-  children: [
-    {path: '/', component: () => import('@/demo/components/Hello-1.vue'), meta: {level: 0, animation: false}},
-    {path: '/Hello-2', component: () => import('@/demo/components/Hello-2.vue'), meta: {level: 1, animation: false}},
-    {path: '/Hello-3', component: () => import('@/demo/components/Hello-3.vue'), meta: {level: 2, animation: false}}
-  ]
-}]
+import { createRouter, createWebHashHistory } from 'vue-router'
 
-export default new VueRouter({
+// 配置页面
+const routes = [
+  {
+    path: '/',
+    // component: vhPageAnimation, // () => import('@/demo/components/Hello-1.vue')
+    component: () => import('@/demo/components/Hello-1.vue'),
+    children: [
+      { path: '', redirect: '/Hello-1-1' },
+      { path: 'Hello-1-1', component: () => import('@/demo/components/Hello-1-1.vue'), meta: { level: 0, animation: false } },
+      { path: 'Hello-1-2', component: () => import('@/demo/components/Hello-1-2.vue'), meta: { level: 1, animation: false } }
+    ]
+  },
+  { path: '/Hello-2', component: () => import('@/demo/components/Hello-2.vue'), meta: { level: 2 } },
+  { path: '/Hello-3', component: () => import('@/demo/components/Hello-3.vue'), meta: { level: 3 } }
+]
+
+export default createRouter({
+  history: createWebHashHistory(),
   routes
 })
+
 ```
 
 **属性**
@@ -188,7 +159,7 @@ export default new VueRouter({
 | level   | Object          | Yes        | 0 | 页面层级     |
 | animation   | Boolean          | No        | true | 是否有页面切换动画     |
 
-#### 详细用法请看src/demo，也可以下载该项目看运行效果。
+#### 详细用法请看src/demo，也可以下载该项目看运行效果。
 
 ``` javascript
 yarn install 或 npm install
@@ -203,14 +174,10 @@ yarn run dev 或 npm run dev
   <div>
     <vh-page :options="options">
       <vh-tabel>
-        <div slot-scope="{sum}">
-          <router-link to="/home/Hello-1-2" tag="a">
-            <h1>Hello Vue 1-2!</h1>
-          </router-link>
-          <router-link to="/Hello-2" tag="a">
-            <h1 v-for="i in sum" :key='i'>{{ msg }}</h1>
-          </router-link>
-        </div>
+        <template v-slot:default="{sum}">
+          <h1 @click="$router.push('/home/Hello-1-2')">Hello Vue 1-2!</h1>
+          <h1 v-for="i in sum" :key='i' @click="$router.push('/Hello-2')">{{ msg }}</h1>
+        </template>
       </vh-tabel>
     </vh-page>
   </div>
@@ -254,6 +221,7 @@ h1 {
   color: #42b983;
 }
 </style>
+
 ```
 
 **属性**
@@ -272,7 +240,7 @@ h1 {
 ``` javascript
 // 前进打开页面执行
 forward () {
-  console.log('前进')
+  console.log('前进')
 },
 // 后退打开页面执行
 back () {

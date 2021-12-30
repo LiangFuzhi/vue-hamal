@@ -1,2 +1,2 @@
-* [快速开始](zh-cn/README.md)
-* [组件](zh-cn/index.md)
+* [快速开始](README.md)
+* [内置组件](index.md)

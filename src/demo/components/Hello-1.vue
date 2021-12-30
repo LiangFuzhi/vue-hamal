@@ -2,19 +2,19 @@
   <!-- <div>
     <vh-page :options="options">
       <vh-tabel>
-        <router-link to="/Hello-2" tag="a" slot-scope="{sum}">
-          <h1 v-for="i in sum" :key='i'>{{ msg }}</h1>
-        </router-link>
+          <h1 v-for="i in sum" :key='i' @click="$router.push('/Hello-2')">{{ msg }}</h1>
       </vh-tabel>
     </vh-page>
   </div> -->
-  <keep-alive>
-    <router-view></router-view>
-  </keep-alive>
+  <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+  </router-view>
 </template>
 
 <script>
-import vhTabel from './vh-tabel.vue'
+// import vhTabel from './vh-tabel.vue'
 export default {
   name: 'demo-1',
   mounted () {
@@ -37,7 +37,7 @@ export default {
     }
   },
   components: {
-    vhTabel
+    // vhTabel
   },
   methods: {
   }

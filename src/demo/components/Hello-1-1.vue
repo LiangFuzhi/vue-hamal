@@ -2,14 +2,10 @@
   <div>
     <vh-page :options="options">
       <vh-tabel>
-        <div slot-scope="{sum}">
-          <router-link to="/home/Hello-1-2" tag="a">
-            <h1>Hello Vue 1-2!</h1>
-          </router-link>
-          <router-link to="/Hello-2" tag="a">
-            <h1 v-for="i in sum" :key='i'>{{ msg }}</h1>
-          </router-link>
-        </div>
+        <template v-slot:default="{sum}">
+          <h1 @click="$router.push('/Hello-1-2')">Hello Vue 1-2!</h1>
+          <h1 v-for="i in sum" :key='i' @click="$router.push('/Hello-2')">{{ msg }}</h1>
+        </template>
       </vh-tabel>
     </vh-page>
   </div>
@@ -20,7 +16,7 @@ import vhTabel from './vh-tabel.vue'
 export default {
   name: 'demo-1-1',
   mounted () {
-    this.$nextTick(() => {})
+    this.$nextTick(() => { })
   },
   data () {
     return {

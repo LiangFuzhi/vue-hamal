@@ -1,40 +1,34 @@
+import mitt from 'mitt'
 /**
- * [VueEventHub 事件中心]
- * @param {[type]} Vue     [description]
+ * [appEventHub 事件中心]
+ * @param {[type]} app     [description]
  * @param {[type]} options [description]
  */
-function VueEventBus (Vue, options = {}) {
-  // 将在各处使用该事件中心
-  // 组件通过它来通信
-  // global 定义全局变量
-  var eventHub = new Vue()
-  // var config = {}
-  // var parameter = Object.assign(config, options)
+function appEventBus (app) {
+  const emitter = mitt()
   // 注入组件
-  Vue.mixin({
+  app.mixin({
     mounted () {
       var events = this.$options.eventBus || false
       if (events) {
         for (var eventName in events) {
           if (typeof this.$options.eventBus[eventName] === 'string') {
-            eventHub.$on(eventName, this[this.$options.eventBus[eventName]].bind(this))
+            emitter.on(eventName, this[this.$options.eventBus[eventName]].bind(this))
           } else if (typeof this.$options.eventBus[eventName] === 'function') {
-            eventHub.$on(eventName, this.$options.eventBus[eventName].bind(this))
+            emitter.on(eventName, this.$options.eventBus[eventName].bind(this))
           }
         }
       }
     }
   })
   // 添加实例方法
-  Vue.prototype.$bus = (eventName, options) => {
-    eventHub.$emit(eventName, options)
+  app.config.globalProperties.$bus = (eventName, options) => {
+    emitter.emit(eventName, options)
   }
-  var strategies = Vue.config.optionMergeStrategies
+  var strategies = app.config.optionMergeStrategies
   strategies.events = strategies.methods
 }
-if (typeof window !== 'undefined' && window.Vue) {
-  window.Vue.use(VueEventBus)
-}
+
 export default {
-  install: VueEventBus
+  install: appEventBus
 }

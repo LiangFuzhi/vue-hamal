@@ -2,30 +2,26 @@
  * @Author: LFZ
  * @Date: 2019-04-17 18:13:49
  * @Last Modified by: LFZ
- * @Last Modified time: 2020-06-05 10:35:49
+ * @Last Modified time: 2021-12-30 16:37:59
  * @Description: 页面动画
  */
 <template>
   <!-- <div ref="bubble"> -->
-    <div ref="page" class="page-touch">
-      <!-- 实现右滑返回的历史页面 -->
-      <div class="page back" ref="back"></div>
-      <!-- end -->
-      <!-- 返回阴影 -->
-      <div class="page-shadow-effect" ref="shadow"></div>
-      <transition
-      @before-enter="beforeEnter"
-      @enter="enter"
-      @after-enter="afterEnter"
-      @before-leave="beforeLeave"
-      @leave="leave"
-      @after-leave="afterLeave"
-      :css="false">
+  <div ref="page" class="page-touch">
+    <!-- 实现右滑返回的历史页面 -->
+    <div class="page back" ref="back"></div>
+    <!-- end -->
+    <!-- 返回阴影 -->
+    <div class="page-shadow-effect" ref="shadow"></div>
+    <router-view class="page active" ref="routerView" v-slot="{ Component }">
+      <transition @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter" @before-leave="beforeLeave" @leave="leave"
+        @after-leave="afterLeave">
         <keep-alive>
-          <router-view class="page active" ref="routerView"></router-view>
+          <component :is="Component" />
         </keep-alive>
       </transition>
-    </div>
+    </router-view>
+  </div>
   <!-- </div> -->
 </template>
 
@@ -35,7 +31,6 @@ import {
   mapMutations
 } from 'vuex'
 import anime from 'animejs'
-import Hammer from 'hammerjs'
 export default {
   name: 'vh-page-animation',
   beforeCreate () {
@@ -79,7 +74,6 @@ export default {
         this.$bus('onTransitionAfter')
       })
     })
-    this.back()
   },
   data () {
     return {
@@ -136,37 +130,12 @@ export default {
   methods: {
     ...mapMutations(['SET_IS_DRAG_BACK', 'SET_IS_TRANSITION_AFTER', 'SET_IS_DRAG']),
     handler () {
-      var hammer = new Hammer(this.$refs.page, {
-        touchAction: 'auto',
-        inputClass: Hammer.TouchInput,
-        recognizers: [
-          [Hammer.Pan, {
-            threshold: 0,
-            pointers: 0
-          }]
-        ]
+      this.$touch({
+        el: this.$refs.page,
+        panstart: this.onPanStart,
+        panmove: this.onPanMove,
+        panend: this.onPanEnd
       })
-      hammer.on('panstart', this.onPanstart)
-      hammer.on('panmove', this.onPanmove)
-      hammer.on('panend', this.onPanend)
-      // this.$refs.page.addEventListener('touchstart', (e) => {
-      //   if (this.isDragBack) {
-      //     e.preventDefault()
-      //     e.stopPropagation()
-      //   }
-      // }, true)
-      // this.$refs.page.addEventListener('touchmove', (e) => {
-      //   if (this.isDragBack) {
-      //     e.preventDefault()
-      //     e.stopPropagation()
-      //   }
-      // }, true)
-      // this.$refs.page.addEventListener('touchend', (e) => {
-      //   if (this.isDragBack) {
-      //     e.preventDefault()
-      //     e.stopPropagation()
-      //   }
-      // }, true)
     },
     // 阻止冒泡
     preventDefault (event) {
@@ -298,23 +267,23 @@ export default {
       // el.style.display = 'none'
     },
     // 滑动开始
-    onPanstart (e) {
+    onPanStart (e) {
       if (this.enterTarget && !this.isDragBack && this.page.isDragBack && ((e.direction === 4) && (Math.abs(e.angle) < 45)) && this.backEl) {
         // this.enterTarget.el.style.touchAction = 'none'
-        this.preventDefault(e.srcEvent)
+        this.preventDefault(e)
         // e.cancelBubble = true
         // e.stopPropagation()
         this.isDragBack = true
-        this.onPanmove(e)
+        this.onPanMove(e)
       } else if (this.enterTarget && this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45) {
-        this.preventDefault(e.srcEvent)
+        this.preventDefault(e)
         this.isSlideBack = true
       }
     },
     // 滑动中
-    onPanmove (e) {
+    onPanMove (e) {
       if (this.isDragBack) {
-        this.preventDefault(e.srcEvent)
+        this.preventDefault(e)
         // e.cancelBubble = true
         // e.stopPropagation()
         let scale = e.deltaX / document.body.clientWidth
@@ -327,13 +296,13 @@ export default {
         this.enterTarget.el.style.transform = `translateX(${scale * 100}%) translateZ(0px)`
         this.onAnimateShadow(scale * 100, (1 - scale) * 1, 0)
       } else if (this.isSlideBack) {
-        this.preventDefault(e.srcEvent)
+        this.preventDefault(e)
       }
     },
     // 滑动结束
-    onPanend (e) {
+    onPanEnd (e) {
       if (this.isDragBack) {
-        this.preventDefault(e.srcEvent)
+        this.preventDefault(e)
         // e.cancelBubble = true
         // e.stopPropagation()
         let scale = e.deltaX / document.body.clientWidth
@@ -368,9 +337,10 @@ export default {
               // if (this.history.record.length > 1) {
               //   this.$router.push(this.history.record[this.history.record.length - 2])
               // }
-              setTimeout(() => {
-                this.$refs.routerView.$el.removeAttribute('style')
-              }, 0)
+              // vue3 router-view会自动清除style
+              // setTimeout(() => {
+              //   this.$refs.routerView.$el.removeAttribute('style')
+              // }, 0)
             }
             setTimeout(() => {
               this.isDragBack = false
@@ -390,7 +360,7 @@ export default {
           })
         }
       } else if (this.isSlideBack && this.enterTarget && this.page.isSlideBack && e.direction === 4 && Math.abs(e.angle) < 45 && e.deltaTime < 200) {
-        this.preventDefault(e.srcEvent)
+        this.preventDefault(e)
         this.isSlideBack = false
         this.$router.back()
       }
@@ -413,75 +383,54 @@ export default {
           opacity
         })
       }
-    },
-    plusReady (event) {
-      if (window.plus) {
-        event()
-      } else {
-        document.addEventListener('plusready', event, false)
-      }
-    },
-    back () {
-      this.plusReady(() => {
-        window.plus.key.addEventListener('backbutton', () => {
-          if (this.isDragBack) return
-          if (!this.page.isBack) {
-            // 把应用切换到后台运行
-            this.$native.moveTaskToBack()
-          } else {
-            if (this.history.record.length > 1) {
-              this.$router.push(this.history.record[this.history.record.length - 2])
-            }
-          }
-        }, false)
-      })
     }
   }
 }
 </script>
 <style>
- html,body {
-  width:100%;
-  height:100%;
+html,
+body {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   padding: 0;
   margin: 0;
- }
+}
 </style>
 
 <style scoped>
-  .page-touch {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    overflow: hidden;
-  }
-  .page {
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    position: absolute !important;
-    padding: 0;
-    margin: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-  .back {
-    z-index: -1;
-    /* transform: translate3d(-100%, 0, 0); */
-  }
-  .page-shadow-effect {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    bottom: 0;
-    /* z-index: -1; */
-    content: '';
-    opacity: 1;
-    right: 100%;
-    background: rgba(0, 0, 0, 0.05);
-    /* background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.2) 100%); */
-  }
+.page-touch {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+.page {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  position: absolute !important;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.back {
+  z-index: -1;
+  /* transform: translate3d(-100%, 0, 0); */
+}
+.page-shadow-effect {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  bottom: 0;
+  /* z-index: -1; */
+  content: '';
+  opacity: 1;
+  right: 100%;
+  background: rgba(0, 0, 0, 0.05);
+  /* background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.2) 100%); */
+}
 </style>

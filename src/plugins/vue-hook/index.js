@@ -6,7 +6,7 @@ import {
  * @param {[type]} Vue     [description]
  * @param {[type]} options [description]
  */
-function VueHook (Vue, options = {}) {
+function VueHook (Vue) {
   // 注入组件
   Vue.mixin({
     computed: {
@@ -28,14 +28,16 @@ function VueHook (Vue, options = {}) {
           Object.assign(this.$data, this.$options.data.bind(this)())
         }
         let forward = this.$options.forward
-        forward && forward.forEach((event) => {
-          event.bind(this)()
-        })
+        forward && forward.bind(this)()
+        // forward && forward.forEach((event) => {
+        //   event.bind(this)()
+        // })
       } else if (this.history.direction === 'reverse') {
         let back = this.$options.back
-        back && back.forEach((event) => {
-          event.bind(this)()
-        })
+        back && back.bind(this)()
+        // back && back.forEach((event) => {
+        //   event.bind(this)()
+        // })
       }
     }
   })
@@ -45,7 +47,4 @@ function VueHook (Vue, options = {}) {
   strategies.back = strategies.activated
 }
 
-if (typeof window !== 'undefined' && window.Vue) {
-  window.Vue.use(VueHook)
-}
 export default VueHook

@@ -1,3 +1,10 @@
+/*
+ * @Author: LFZ
+ * @Date: 2021-11-11 11:09:58
+ * @Last Modified by: LFZ
+ * @Last Modified time: 2021-11-11 11:20:20
+ * @Description: 记录历史页面dom
+ */
 export default (store, router) => {
   store.registerModule('history', {
     state: {
@@ -55,28 +62,32 @@ export default (store, router) => {
           .then((forward) => {
             // 判断是否根目录
             if (context.state.record.length && (payload.to.path === '/' || payload.to.meta.level === 0)) {
-              context.commit('SET_RECORD', { record: [{
-                path: payload.to.path,
-                scrollTop: 0,
-                el: ''
-              }] })
+              context.commit('SET_RECORD', {
+                record: [{
+                  path: payload.to.path,
+                  scrollTop: 0,
+                  el: ''
+                }]
+              })
             } else if (forward) {
               // 如果执行的是replace则删除上一个页面
               if (context.state.routerState === 'replace') {
                 context.state.record.pop()
-              // 记录上一个一个最后的样式
+                // 记录上一个最后的样式
               } else if (payload.from.matched.length) {
                 let record = context.state.record
                 // 拿到最后一个
-                record[record.length - 1].el = payload.from.matched[0].instances.default.$el
+                record[record.length - 1].el = payload.from.matched[payload.from.matched.length - 1].instances.default.$el
                 context.commit('SET_RECORD', { record: record })
               }
               // 记录新页面
-              context.dispatch('onHistoryPush', { record: {
-                path: payload.to.path,
-                scrollTop: 0,
-                el: ''
-              } })
+              context.dispatch('onHistoryPush', {
+                record: {
+                  path: payload.to.path,
+                  scrollTop: 0,
+                  el: ''
+                }
+              })
             }
             // 判断前进还是后退
             if ((payload.to.meta.level !== undefined) && (payload.from.meta.level !== undefined)) {
@@ -172,7 +183,7 @@ export default (store, router) => {
       })
   })
 
-  router.afterEach(function (to, from) {
+  router.afterEach(function (to) {
     firstOpen = false
     store.commit('SET_LOADING_STATUS', { isLoading: false })
     setTimeout(() => {
