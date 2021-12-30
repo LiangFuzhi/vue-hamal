@@ -6,7 +6,7 @@ function resolve (dir) {
 const isProduction = process.env.NODE_ENV === 'production'
 module.exports = {
   productionSourceMap: false,
-  publicPath: './dist',
+  publicPath: '',
   outputDir: 'dist',
   // assetsDir: 'static',
   pages: {
