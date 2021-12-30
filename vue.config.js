@@ -6,6 +6,9 @@ function resolve (dir) {
 const isProduction = process.env.NODE_ENV === 'production'
 module.exports = {
   productionSourceMap: false,
+  publicPath: './dist',
+  outputDir: 'dist',
+  // assetsDir: 'static',
   pages: {
     index: {
       // page 的入口
