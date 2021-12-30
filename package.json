@@ -1,7 +1,7 @@
 {
   "name": "vue-hamal",
-  "version": "2.0.0",
-  "description": "vue3页面动画快速构建工具",
+  "version": "2.0.1",
+  "description": "基于vue3 + router + Vuex快速实现原生app的页面切换效果",
   "private": false,
   "main": "src/index.js",
   "scripts": {
