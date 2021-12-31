@@ -9,9 +9,10 @@
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon.ico">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsify/4.12.1/themes/vue.min.css"
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsify/4.12.1/themes/vue.min.css"
     integrity="sha512-Ofuff/As5MXt1cOVWpU4ND48tYNjnE0Wc6qv0FHqW+FGueMbJyjJWNNpJ3m+92V1txLsEiDxl6UKTIDanAep6g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+    crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/docsify/4.12.1/themes/vue.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -46,11 +47,11 @@
       search: {
         maxAge: 86400000, // 过期时间，单位毫秒，默认一天
         paths: [
-          '/zh-cn/README.md',
-          '/zh-cn/components/vh-page',
-          '/zh-cn/components/vh-page-animation',
-          '/zh-cn/components/vh-header',
-          '/zh-cn/components/vh-scroller',
+          'README.md',
+          '/components/vh-page.md',
+          '/components/vh-page-animation.md',
+          '/components/vh-header.md',
+          '/components/vh-scroller.md',
         ],
         placeholder: '搜索',
 
@@ -73,12 +74,16 @@
       }
     }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docsify/4.12.1/docsify.min.js"
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/docsify/4.12.1/docsify.min.js"
     integrity="sha512-Pt6M2HFXOZxiNMEwxXx8aQD/ilDwvqb7ybZDMJTGD6TNpfKluyjsbYWHxbT/7mgQ4+DD77lQTBlrIffLz24UCA=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docsify/4.12.1/plugins/search.min.js"
     integrity="sha512-Rhy+mgVK0MkXbjXjsaFUgGvqNOcArsXC/Y/8L13gkBLKHp7DyUnWstQ6ns8W49mwgcglLgq7kgDyiWWvOZFZmQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/docsify/4.12.1/docsify.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/docsify/4.12.1/plugins/search.min.js"></script>
+
 
 
 </html>
