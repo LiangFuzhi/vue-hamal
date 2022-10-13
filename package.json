@@ -17,7 +17,7 @@
     "mitt": "^3.0.0",
     "nprogress": "^0.2.0",
     "vue": "^3.2.21",
-    "vue-meta": "^3.0.0-alpha.9",
+    "vue-meta": "^3.0.0-alpha.10",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"
   },

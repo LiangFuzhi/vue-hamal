@@ -8607,10 +8607,10 @@ vue-loader@^15.9.2:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-meta@^3.0.0-alpha.9:
-  version "3.0.0-alpha.9"
-  resolved "https://registry.nlark.com/vue-meta/download/vue-meta-3.0.0-alpha.9.tgz?cache=0&sync_timestamp=1623027058156&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvue-meta%2Fdownload%2Fvue-meta-3.0.0-alpha.9.tgz#304999dc67337245947c2a08d7d94df984864c61"
-  integrity sha1-MEmZ3GczckWUfCoI19lN+YSGTGE=
+vue-meta@^3.0.0-alpha.10:
+  version "3.0.0-alpha.10"
+  resolved "https://registry.npmjs.org/vue-meta/-/vue-meta-3.0.0-alpha.10.tgz#8aa7dee8ef43edda2633d52d2d4ca0ae03352222"
+  integrity sha512-rYeIGkhm1gKBcReEkPHiV6LV2Y6BZTMGTkGw1mQIZTxfFcVJL0srLZsL1zAmLeTGxMrlDYylMQEVSYRkDnwz3A==
 
 vue-router@^4.0.12:
   version "4.0.12"
